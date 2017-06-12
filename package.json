@@ -1,0 +1,19 @@
+{
+  "name": "osm-analytics-api",
+  "version": "0.0.1",
+  "description": "An API to consume OSM statistics as in the OSM Analytics client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GFDRR/osm-analytics-api.git"
+  },
+  "author": "Vizzuality <http://vizzuality.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GFDRR/osm-analytics-api/issues"
+  },
+  "homepage": "https://github.com/GFDRR/osm-analytics-api#readme"
+}
