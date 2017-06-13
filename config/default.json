@@ -1,0 +1,12 @@
+{
+     "logger": {
+        "name": "osm-analytics-api-DEV",
+        "level": "debug",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "name": "OSM Analytics API",
+        "port": 3000
+    }
+}

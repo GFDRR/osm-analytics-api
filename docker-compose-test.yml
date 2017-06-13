@@ -1,0 +1,8 @@
+test:
+  extends:
+    file: base.yml
+    service: base
+  ports:
+    - "3000"
+  container_name: osm-analytics-api-test
+  command: test

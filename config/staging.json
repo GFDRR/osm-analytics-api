@@ -1,0 +1,8 @@
+{
+    "logger": {
+        "name": "osm-analytics-api",
+        "level": "info",
+        "toFile": false,
+        "dirLogFile": null
+    }
+}

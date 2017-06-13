@@ -1,0 +1,9 @@
+develop:
+  extends:
+    file: base.yml
+    service: base
+  ports:
+    - "35729:35729"
+  command: develop
+  volumes:
+    - ./app:/opt/osm-analytics-api/app
