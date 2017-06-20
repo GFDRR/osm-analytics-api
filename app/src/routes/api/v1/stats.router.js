@@ -13,13 +13,11 @@ class OSMRouter {
 
   static async calculate(ctx, geometry) {
 
-
+    //TODO: Limits depends on area of geometry
     const limits = {
       min_zoom: 3,
       max_zoom: 3
     };
-
-    logger.debug(JSON.stringify(geometry));
 
     const tiles = cover.tiles(geometry, limits);
     logger.debug('Num tiles', tiles.length);
@@ -54,14 +52,11 @@ class OSMRouter {
         [ctx.params.minLng, ctx.params.maxLat]
       ]
     ];
-
-
     const geometry = {
       type: 'Polygon',
       coordinates,
     };
 
-    logger.debug(JSON.stringify(geometry));
     await OSMRouter.calculate(ctx, geometry);
   }
 
