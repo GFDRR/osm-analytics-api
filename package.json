@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@mapbox/tile-cover": "^3.0.2",
-    "bluebird": "^3.4.7",
+    "bluebird": "^3.5.0",
     "bunyan": "^1.8.5",
     "config": "^1.21.0",
     "jsonapi-serializer": "2.1.1",
@@ -50,6 +50,7 @@
     "mbtiles": "^0.9.0",
     "pbf": "^3.0.5",
     "polyline": "^0.2.0",
+    "redis": "^2.7.1",
     "request": "^2.79.0",
     "request-promise": "^4.2.1",
     "tilelive": "^5.12.3",

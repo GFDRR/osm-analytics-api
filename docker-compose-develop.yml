@@ -5,5 +5,12 @@ develop:
   ports:
     - "35729:35729"
   command: develop
+  links:
+    - redis
   volumes:
-    - ./app:/opt/osm-analytics-api/app
+    - ./app/src:/opt/osm-analytics-api/app/src
+
+redis:
+  extends:
+    file: base.yml
+    service: redis

@@ -8,5 +8,11 @@
     "service": {
         "name": "OSM Analytics API",
         "port": 3000
-    }
+    },
+    "redis": {
+      "host": null,
+      "port": null,
+      "timeCache": 3600
+    },
+    "hotProjectsUrl": "https://s3.amazonaws.com/tm-projects-vt/hotprojects.geojson"
 }

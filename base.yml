@@ -7,3 +7,9 @@ base:
     PORT: 3000
     NODE_PATH: app/src
 
+redis:
+  image: redis
+  container_name: osm-analytics-redis
+  ports:
+    - "6379:6379"
+  restart: always

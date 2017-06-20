@@ -1,6 +1,5 @@
 const logger = require('logger');
 const tileService = require('services/tile.service');
-const PBFService = require('services/pbf.service');
 
 class OSMService {
 
@@ -37,7 +36,7 @@ class OSMService {
     return summary;
   }
 
-  static async summary(tiles, level)  {
+  static async summary(layer, tiles, level)  {
     logger.debug('Obtaining summary of ', tiles);
     let summary = {
       count: 0,
@@ -48,22 +47,20 @@ class OSMService {
 
     for (let tile of tiles) {
       try {
-        logger.debug('Obtaining tile ', tile);
+        //logger.debug('Obtaining tile ', tile);
 
-        const data = await tileService.getTile(tile[2], tile[0], tile[1]);
-
-        const features = await PBFService.parseTile(data, tile[2], tile[0], tile[1]);
-
-        for (let feature of features) {
-          if (level > 12) {
-            summary = OSMService.summaryLevel13(feature, summary);
-          } else {
-            summary = OSMService.summaryLevel12(feature, summary);
+        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer);
+        if (features) {
+          for (let feature of features) {
+            if (level > 12) {
+              summary = OSMService.summaryLevel13(feature, summary);
+            } else {
+              summary = OSMService.summaryLevel12(feature, summary);
+            }
           }
-
         }
       } catch (err) {
-        // logger.error(err);
+        logger.error(err);
       }
     }
     return summary;
