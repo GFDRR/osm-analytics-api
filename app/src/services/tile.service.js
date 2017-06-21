@@ -13,16 +13,16 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 class TileService {
 
   constructor() {
-    const pathMbtile = path.resolve(`${__dirname}/../data/mbtiles/buildings.mbtiles`);
+    // const pathMbtile = path.resolve(`${__dirname}/../data/mbtiles/buildings.mbtiles`);
 
-    tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
-      if (err) {
-        logger.error(err);
-        process.exit(1);
-      }
-      logger.info('Buildings mbtile loaded correctly!!!');
-      this.source = source;
-    });
+    // tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
+    //   if (err) {
+    //     logger.error(err);
+    //     process.exit(1);
+    //   }
+    //   logger.info('Buildings mbtile loaded correctly!!!');
+    //   this.source = source;
+    // });
 
     this.redisClient = redis.createClient({
       host: config.get('redis.host'),
