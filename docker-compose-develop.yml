@@ -9,6 +9,15 @@ develop:
     - redis
   volumes:
     - ./app/src:/opt/osm-analytics-api/app/src
+cron:
+  extends:
+    file: base.yml
+    service: base
+  command: cron
+  links:
+    - redis
+  volumes:
+    - ./app/src:/opt/osm-analytics-api/app/src
 
 redis:
   extends:

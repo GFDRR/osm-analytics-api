@@ -1,12 +1,12 @@
 const logger = require('logger');
 const config = require('config');
-const tilelive = require('tilelive');
+// const tilelive = require('tilelive');
 const path = require('path');
 const redis = require('redis');
 const bluebird = require('bluebird');
 const request = require('request-promise');
 const PBFService = require('services/pbf.service');
-require('mbtiles').registerProtocols(tilelive);
+const redisService = require('services/redis.service');
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
@@ -23,17 +23,11 @@ class TileService {
     //   logger.info('Buildings mbtile loaded correctly!!!');
     //   this.source = source;
     // });
-
-    this.redisClient = redis.createClient({
-      host: config.get('redis.host'),
-      port: config.get('redis.port'),
-    });
-    this.timeCache = config.get('redis.timeCache');
   }
 
 
-  async getTileServer(z, x, y, layer = 'buildings') {
-    let data = await this.redisClient.getAsync(`${layer}/${z}/${x}/${y}`);
+  async getTileServer(z, x, y, layer = 'buildings', cache=true) {
+    let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
     if (data) {
       if (data === 'empty'){
         return null;
@@ -55,14 +49,16 @@ class TileService {
       }, z, x, y);
 
       logger.debug(`Saving cache ${layer}/${z}/${x}/${y}`);
-      this.redisClient.setex(`${layer}/${z}/${x}/${y}`, this.timeCache, JSON.stringify(data));
+      if (cache) {
+        redisService.setex(`${layer}/${z}/${x}/${y}`, JSON.stringify(data));
+      }
 
       return data;
     } catch(err) {
       logger.error(err);
       if (err.statusCode === 404) {
         logger.info(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
-        this.redisClient.setex(`${layer}/${z}/${x}/${y}`, this.timeCache, 'empty');
+        redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');
       }
     }
   }

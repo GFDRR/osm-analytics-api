@@ -26,5 +26,7 @@ router.get('/countries', MetaRouter.countries);
 router.get('/hot', MetaRouter.hot);
 
 
-
-module.exports = router;
+module.exports = {
+  router,
+  class: MetaRouter
+};

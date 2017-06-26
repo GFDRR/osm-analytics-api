@@ -20,9 +20,9 @@ module.exports = (function () {
                     } else {
                         logger.debug('Loading route %s, in path %s', newPath, pathApi);
                         if (pathApi) {
-                            app.use(mount(pathApi, require(newPath).middleware()));
+                            app.use(mount(pathApi, require(newPath).router.middleware()));
                         } else {
-                            app.use(require(newPath).middleware());
+                            app.use(require(newPath).router.middleware());
                         }
                     }
                 }
@@ -37,9 +37,9 @@ module.exports = (function () {
             const newPath = path ? (`${path}/indexRouter.js`) : 'indexRouter.js';
             logger.debug('Loading route %s, in path %s', newPath, pathApi);
             if (pathApi) {
-                app.use(mount(pathApi, require(newPath).middleware()));
+                app.use(mount(pathApi, require(newPath).router.middleware()));
             } else {
-                app.use(require(newPath).middleware());
+                app.use(require(newPath).router.middleware());
             }
         }
     };
