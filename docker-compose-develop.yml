@@ -12,7 +12,7 @@ develop:
 cron:
   extends:
     file: base.yml
-    service: base
+    service: cron
   command: cron
   links:
     - redis

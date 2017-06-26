@@ -58,6 +58,15 @@ module.exports = function (grunt) {
                     spawn: false
                 }
             },
+            cron: {
+                files: [
+                    'app/src/**/*.js',
+                ],
+                tasks: ['mochaTest:unit', 'express:cron'],
+                options: {
+                    spawn: false
+                }
+            },
             unitTest: {
                 files: [
                     'app/test/unit/**/*.test.js',
@@ -91,7 +100,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('serve', ['express:dev', 'watch']);
 
-    grunt.registerTask('serve-cron', ['express:cron', 'watch']);
+    grunt.registerTask('serve-cron', ['express:cron', 'watch:cron']);
 
     grunt.registerTask('default', 'serve');
 

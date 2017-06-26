@@ -4,8 +4,11 @@ const redisService = require('services/redis.service');
 const StatsRouter = require('routes/api/v1/stats.router').class;
 
 const countries = require('data/countries.geo.json');
-
+let running = false;
 async function tick() {
+  if (!running){
+    let time = Date.now();
+    running= true;
     logger.info('Populating cache');
     await redisService.clearCache();
     for(let i = 0, length = countries.features.length; i < length; i++) {
@@ -17,11 +20,13 @@ async function tick() {
         }
       };
       await StatsRouter.country(ctx);
-
+      logger.info(`Saving in cache /stats/all/country/${ctx.params.iso3}`);
       redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body));
-
     }
-
+    running = false;
+    logger.info(`Cron finished!! ${Date.now() - time}`);
+  }
 }
 
-new CronJob('*/30 * * * * *', tick, null, true, 'America/Los_Angeles');  // eslint-disable-line no-new
+logger.info('Cron started');
+new CronJob('00 00 23 * * *', tick, null, true, 'Europe/Madrid');  // eslint-disable-line no-new

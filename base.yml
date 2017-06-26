@@ -7,6 +7,12 @@ base:
     PORT: 3000
     NODE_PATH: app/src
 
+cron:
+  build: .
+  container_name: osm-analytics-cron
+  environment:
+    NODE_PATH: app/src
+
 redis:
   image: redis
   container_name: osm-analytics-redis

@@ -55,7 +55,7 @@ class TileService {
 
       return data;
     } catch(err) {
-      logger.error(err);
+      logger.debug(err);
       if (err.statusCode === 404) {
         logger.info(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
         redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');
