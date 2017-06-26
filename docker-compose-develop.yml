@@ -9,6 +9,7 @@ develop:
     - redis
   volumes:
     - ./app/src:/opt/osm-analytics-api/app/src
+  restart: always
 cron:
   extends:
     file: base.yml
@@ -18,8 +19,9 @@ cron:
     - redis
   volumes:
     - ./app/src:/opt/osm-analytics-api/app/src
-
+  restart: always
 redis:
   extends:
     file: base.yml
     service: redis
+  restart: always
