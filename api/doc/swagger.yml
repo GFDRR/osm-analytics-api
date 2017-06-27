@@ -154,6 +154,26 @@ paths:
             items:
               $ref: "#/definitions/Countries"
 
+  /meta/country_polyline/{iso3}:
+    get:
+      tags:
+      - "meta"
+      summary: "Gets an encoded polyline for a given country ISO3 code"
+      produces:
+      - "application/text"
+      parameters:
+      - name: "iso3"
+        in: "path"
+        description: "iso3 code of a country"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+
+
   /meta/feature-types:
     get:
       tags:
