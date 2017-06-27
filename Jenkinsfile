@@ -15,13 +15,11 @@ node {
 
   try {
 
-
     stage('Deploy') {
 
       if (env.BRANCH_NAME == "develop") {
-        // alternative deployment pipeline for production
         sshagent (credentials: ['osma_staging']) {
-          sh 'ssh -o StrictHostKeyChecking=no ubuntu@${OSMA_STAGING} "cd /home/ubuntu/projects/osm-analytics-api && ./start.sh"'
+          sh 'ssh -o StrictHostKeyChecking=no ubuntu@${OSMA_STAGING}w "cd /home/ubuntu/projects/osm-analytics-api && ./start.sh"'
         }
       } else {
 
@@ -32,11 +30,11 @@ node {
   } catch (err) {
 
     currentBuild.result = "FAILURE"
-    // mail body: "project build error is here: ${env.BUILD_URL}" ,
-    // from: 'xxxx@yyyy.com',
-    // replyTo: 'yyyy@yyyy.com',
-    // subject: 'project build failed',
-    // to: 'zzzz@yyyyy.com'
+    mail body: "project build error is here: ${env.BUILD_URL}" ,
+    from: 'jenkins@vizzuality.com',
+    replyTo: 'noreply@vizzuality.com',
+    subject: 'project build failed',
+    to: 'raul.requero@vizzuality.com'
 
     throw err
   }
