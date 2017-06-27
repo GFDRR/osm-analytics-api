@@ -29,7 +29,7 @@ paths:
       parameters:
       - name: "feature_type"
         in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of feature types."
         required: true
         type: "string"
       - name: "iso3"
@@ -154,7 +154,7 @@ paths:
             items:
               $ref: "#/definitions/Countries"
 
-  /feature_types:
+  /meta/feature-types:
     get:
       tags:
       - "meta"

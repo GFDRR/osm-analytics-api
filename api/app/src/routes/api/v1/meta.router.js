@@ -30,9 +30,16 @@ class MetaRouter {
     ctx.body = body;
   }
 
+  static async featureTypes(ctx) {
+    logger.info('Obtaining feature types');
+    const body = ['buildings', 'highways', 'waterways', 'all'];
+    ctx.body = body;
+  }
+
 }
 
 router.get('/countries', MetaRouter.countries);
+router.get('/feature-types', MetaRouter.featureTypes);
 router.get('/hot', MetaRouter.hot);
 
 

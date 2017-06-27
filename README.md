@@ -1,7 +1,7 @@
 # osm analytics api 
 
 [View the documentation for this
-API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/app/doc/swagger.yml)
+API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/doc/swagger.yml)
 
 1. [Getting Started](#getting-started)
 2. [Prod configuration](#prod-configuration)
