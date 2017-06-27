@@ -26,6 +26,8 @@ cd osm-analytics-api
 
 ```
 
+Open [http://localhost/api/v1/meta/contries](http://localhost/api/v1/meta/contries)
+
 ## Prod configuration
 
 

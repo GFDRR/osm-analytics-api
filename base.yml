@@ -4,8 +4,6 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    ports:
-      - "3000"
     container_name: osm-analytics-api
     environment:
       PORT: 3000
@@ -22,8 +20,6 @@ services:
   redis:
     image: redis
     container_name: osm-analytics-redis
-    ports:
-      - "6379:6379"
     restart: always
 
   nginx:
