@@ -33,7 +33,6 @@ node {
     notifyFailed()
     throw err
   }
-
 }
 
 def notifySuccessful() {
