@@ -24,17 +24,14 @@ node {
       } else {
 
       }
+      mail bcc: '', body: 'Project  ${JOB_NAME} build success is here: ${env.BUILD_URL}', cc: '', from: '', replyTo: '', subject: 'Project osm build success', to: 'raul.requero@vizzuality.com'
 
     }
 
   } catch (err) {
 
     currentBuild.result = "FAILURE"
-    mail body: "project build error is here: ${env.BUILD_URL}" ,
-    from: 'jenkins@vizzuality.com',
-    replyTo: 'noreply@vizzuality.com',
-    subject: 'project build failed',
-    to: 'raul.requero@vizzuality.com'
+    mail bcc: '', body: 'Project ${JOB_NAME} build error is here: ${env.BUILD_URL}', cc: '', from: '', replyTo: '', subject: 'Project osm build failed', to: 'raul.requero@vizzuality.com'
 
     throw err
   }
