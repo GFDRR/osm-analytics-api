@@ -20,7 +20,7 @@ node {
 
       if (env.BRANCH_NAME == "develop") {
         // alternative deployment pipeline for production
-        sh 'ssh ubuntu@${OSMA_STAGING} /home/ubuntu/projects/osm-analytics-api/start.sh'
+        sh 'ssh -v ubuntu@${OSMA_STAGING} /home/ubuntu/projects/osm-analytics-api/start.sh'
       } else {
 
       }
