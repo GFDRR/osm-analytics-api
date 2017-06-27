@@ -19,7 +19,7 @@ node {
 
       if (env.BRANCH_NAME == "develop") {
         sshagent (credentials: ['osma_staging']) {
-          sh 'ssh -o StrictHostKeyChecking=no ubuntu@${OSMA_STAGING}w "cd /home/ubuntu/projects/osm-analytics-api && ./start.sh"'
+          sh 'ssh ubuntu@${OSMA_STAGING}" cd /home/ubuntu/projects/osm-analytics-api && ./start.sh"'
         }
       } else {
 
