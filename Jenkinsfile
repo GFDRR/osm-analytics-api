@@ -20,7 +20,7 @@ node {
 
       if (env.BRANCH_NAME == "develop") {
         // alternative deployment pipeline for production
-        sh 'ssh-add -l'
+        sh 'eval "$(ssh-agent -s)" && ssh-add -l'
         sh 'ssh -v ubuntu@${OSMA_STAGING} /home/ubuntu/projects/osm-analytics-api/start.sh'
       } else {
 
