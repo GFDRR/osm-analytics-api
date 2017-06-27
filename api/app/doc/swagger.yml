@@ -1,0 +1,330 @@
+swagger: "2.0"
+info:
+  description: "An API to consume OSM statistics as in the OSM Analytics client"
+  version: "0.0.1"
+  title: "OSM Analytics API"
+  contact:
+    name: "Vizzuality"
+    url: "http://vizzuality.com"
+  license:
+    name: "MIT"
+basePath: "/api/v1"
+tags:
+- name: "stats"
+  description: "Core stats"
+- name: "meta"
+  description: "Metadata"
+schemes:
+- "http"
+
+paths:
+
+  /stats/{feature_type}/country/{iso3}:
+    get:
+      tags:
+      - "stats"
+      summary: "Gets OSM stats for a country"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        required: true
+        type: "string"
+      - name: "iso3"
+        in: "path"
+        description: "iso3 code of a country"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FeatureStats"
+        404:
+          description: "Country not found"
+
+  /stats/{feature_type}/area/{polyline}:
+    get:
+      tags:
+      - "stats"
+      summary: "Gets OSM stats for an arbitrary area"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        required: true
+        type: "string"
+      - name: "polyline"
+        in: "path"
+        description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm)"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FeatureStats"
+        413:
+          description: "Encoded polyline is too big"
+
+  /stats/{feature_type}/bbox/{minLng}/{minLat}/{maxLng}/{maxLat}:
+    get:
+      tags:
+      - "stats"
+      summary: "Gets OSM stats for a bounding box"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        required: true
+        type: "string"
+      - name: "minLng"
+        in: "path"
+        description: "Minimum longitude"
+        required: true
+        type: "number"
+      - name: "minLat"
+        in: "path"
+        description: "Minimum latitude"
+        required: true
+        type: "number"
+      - name: "maxLng"
+        in: "path"
+        description: "Maximum longitude"
+        required: true
+        type: "number"
+      - name: "maxLat"
+        in: "path"
+        description: "Maximum latitude"
+        required: true
+        type: "number"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FeatureStats"
+        405:
+          description: "Invalid bounding box"
+
+  /stats/{feature_type}/project/{project_id}:
+    get:
+      tags:
+      - "stats"
+      summary: "Gets OSM stats within the boundaries of a HOT project"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        required: true
+        type: "string"
+      - name: "project_id"
+        in: "path"
+        description: "id of HOT project"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FeatureStats"
+        404:
+          description: "Project not found"
+
+  /meta/countries:
+    get:
+      tags:
+      - "meta"
+      summary: "Gets all available countries"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Countries"
+
+  /feature_types:
+    get:
+      tags:
+      - "meta"
+      summary: "Gets all available feature types (ie buildings, highways, etc)"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/FeatureType"
+
+definitions:
+  Countries:
+    type: "array"
+    items:
+      $ref: "#/definitions/Country"
+  Country:
+    type: "object"
+    properties:
+      iso:
+        type: "string"
+      name:
+        type: "string"
+
+  FeatureType:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      geometry:
+        type: "string"
+        enum:
+        - "LineString"
+        - "Polygon"
+      tag:
+        type: "string"
+
+  Histogram:
+    type: "object"
+    properties:
+      values:
+        description: "an array of timestamps, user experiences, activity..."
+        type: "array"
+        items:
+          type: "integer"
+          format: "int32"
+
+  User:
+    type: "object"
+    description: "An OSM user"
+    properties:
+      osm_id:
+        type: "string"
+      name:
+        type: "string"
+      num_features:
+        description: "Number of [feature] edited in this area"
+        type: "integer"
+        format: "int32"
+      is_local:
+        description: "Is the user a local or remote mapper, as a confidence value between 0 and 1 (0: very likely to be a remote mapper, 1: very likely to be a local mapper)."
+        type: "integer"
+        format: "int32"
+  Experience:
+    type: "object"
+    description: "An OSM experience item"
+    properties:
+      experience:
+        type: "integer"
+        format: "int32"
+        description: Value between 1 - 12
+      count_experience:
+        type: "integer"
+        format: "int32"
+        description: Users with this experience
+  Recency:
+    type: "object"
+    description: "An OSM experience item"
+    properties:
+      day:
+        type: "integer"
+        format: "int32"
+        description: Timestamp with the day
+      count_day:
+        type: "integer"
+        format: "int32"
+        description: Num items this day
+  FeatureStats:
+    type: "object"
+    properties:
+      buildings:
+        type: object
+        properties:
+          users:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+          experience:
+            type: "array"
+            items:
+              $ref: "#/definitions/Experience"
+          recency:
+            type: "array"
+            items:
+              $ref: "#/definitions/Recency"
+
+          features:
+            type: "object"
+            properties:
+              userExperienceMin:
+                type: "integer"
+                format: "int32"
+                description: Minimun experience for the feature
+              userExperienceMax:
+                type: "integer"
+                format: "int32"
+                description: Maximun experience for the feature
+              userExperienceMean:
+                type: "integer"
+                format: "float"
+                description: Mean experience for the feature
+              num:
+                type: "integer"
+                format: "int32"
+                description: Num features
+              count:
+                type: "integer"
+                format: "int32"
+                description: num buildings
+      highways:
+        type: object
+        properties:
+          users:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+          experience:
+            type: "array"
+            items:
+              $ref: "#/definitions/Experience"
+          recency:
+            type: "array"
+            items:
+              $ref: "#/definitions/Recency"
+
+          features:
+            type: "object"
+            properties:
+              userExperienceMin:
+                type: "integer"
+                format: "int32"
+                description: Minimun experience for the feature
+              userExperienceMax:
+                type: "integer"
+                format: "int32"
+                description: Maximun experience for the feature
+              userExperienceMean:
+                type: "integer"
+                format: "float"
+                description: Mean experience for the feature
+              num:
+                type: "integer"
+                format: "int32"
+                description: Num features
+              count:
+                type: "integer"
+                format: "int32"
+                description: length kms

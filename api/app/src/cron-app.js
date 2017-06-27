@@ -17,6 +17,9 @@ async function tick() {
         params: {
           iso3: countries.features[i].properties.iso,
           featureType: 'all'
+        },
+        query: {
+          nocache: 'true'
         }
       };
       await StatsRouter.country(ctx);

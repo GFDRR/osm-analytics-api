@@ -12,30 +12,19 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 
 class TileService {
 
-  constructor() {
-    // const pathMbtile = path.resolve(`${__dirname}/../data/mbtiles/buildings.mbtiles`);
-
-    // tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
-    //   if (err) {
-    //     logger.error(err);
-    //     process.exit(1);
-    //   }
-    //   logger.info('Buildings mbtile loaded correctly!!!');
-    //   this.source = source;
-    // });
-  }
+  constructor() {}
 
 
-  async getTileServer(z, x, y, layer = 'buildings', cache=true) {
+  async getTileServer(z, x, y, layer = 'buildings', nocache=false) {
     let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
-    if (data) {
+    if (data && !nocache) {
       if (data === 'empty'){
         return null;
       }
       return JSON.parse(data);
     }
     logger.debug(`Cache fail ${layer}/${z}/${x}/${y}`);
-    const url = `http://da-tiles.osm-analytics.org/${layer}/${z}/${x}/${y}.pbf`;
+    const url = `${config.get('tileServerUrl')}${layer}/${z}/${x}/${y}.pbf`;
     try {
       const res = await request.get({
         url,
@@ -49,7 +38,7 @@ class TileService {
       }, z, x, y);
 
       logger.debug(`Saving cache ${layer}/${z}/${x}/${y}`);
-      if (cache) {
+      if (!nocache) {
         redisService.setex(`${layer}/${z}/${x}/${y}`, JSON.stringify(data));
       }
 
@@ -57,7 +46,7 @@ class TileService {
     } catch(err) {
       logger.debug(err);
       if (err.statusCode === 404) {
-        logger.info(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
+        logger.debug(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
         redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');
       }
     }

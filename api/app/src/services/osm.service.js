@@ -1,6 +1,7 @@
 const logger = require('logger');
 const request = require('request-promise');
 const tileService = require('services/tile.service');
+const config = require('config');
 
 class OSMService {
 
@@ -108,7 +109,33 @@ class OSMService {
     return summary;
   }
 
-  static async summary(layer, tiles, level)  {
+  static async manageUsers(users) {
+    let arrayUsers = [];
+    if (users) {
+      arrayUsers = Object.keys(users).map(key => {
+        return {
+          id: key,
+          value: users[key]
+        }
+      }).sort((a, b) => {
+        if (a.value < b.value) {
+          return 1;
+        } else if (a.value === b.value) {
+          return 0;
+        }
+        return -1;
+      });
+
+      let usersIds = Object.keys(users);
+      for (let i = 0, length = arrayUsers.length; i < length && i < 20; i++) {
+        let name = await OSMService.getUser(arrayUsers[i].id);
+        arrayUsers[i].name = name;
+      }
+    }
+    return arrayUsers;
+  }
+
+  static async summary(layer, tiles, level, nocache)  {
     logger.debug('Obtaining summary of ', tiles);
     let summary = {
       count: 0,
@@ -122,7 +149,7 @@ class OSMService {
     for (let tile of tiles) {
       try {
         //logger.debug('Obtaining tile ', tile);
-        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer);
+        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
         if (features) {
           for (let feature of features) {
             summary.num++;
@@ -151,65 +178,22 @@ class OSMService {
       }));
     }
     summary.userExperience = summary.userExperience / summary.num;
-    let users = {};
-    if (summary.users){
-      let usersIds = Object.keys(summary.users);
-      for (let i= 0, length = usersIds.length; i < length; i++) {
-        //http://whosthat.osmz.ru/whosthat.php?action=last&id=2243399
-        let name = await OSMService.getUser(usersIds[i]);
-        if (!users[name]){
-          users[name] = 0;
-        }
-        users[name] += summary.users[usersIds[i]];
-      }
-    }
-    summary.users = users;
+
+    summary.users = await OSMService.manageUsers(summary.users);
     return summary;
   }
 
-  static async getUser(userId){
-    try {
-      const body = await request.get(`http://whosthat.osmz.ru/whosthat.php?action=last&id=${userId}`);
+  static async getUser(userId) {
+    try  {
+      const body = await request.get(`${config.get('usersAPI')}${userId}`);
       const name = JSON.parse(body);
       if (name && name.length === 1 && name[0]) {
         return name[0];
       }
       return 'noname';
-    } catch(err) {
+    } catch (err) {
       return 'noname';
     }
-   }
-
-  static async calculateUsers(tiles, zoom) {
-    logger.debug('Obtaining summary of ', tiles.length);
-    let summary = {};
-
-    for (let tile of tiles) {
-      try {
-        //logger.debug('Obtaining tile ', tile);
-        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], undefined, false);
-        if (features) {
-          for (let feature of features) {
-            summary = OSMService.summaryLevel13Users(feature, summary);
-          }
-        }
-      } catch (err) {
-        logger.error(err);
-      }
-    }
-    let users = {};
-    if (summary){
-      let usersIds = Object.keys(summary);
-      for (let i= 0, length = usersIds.length; i < length; i++) {
-        let name = await OSMService.getUser(usersIds[i]);
-        if (!users[name]){
-          users[name] = 0;
-        }
-        users[name] += summary[usersIds[i]];
-      }
-    }
-
-    return users;
   }
 
 }

@@ -1,27 +1,42 @@
-develop:
-  extends:
-    file: base.yml
-    service: base
-  ports:
-    - "35729:35729"
-  command: develop
-  links:
-    - redis
-  volumes:
-    - ./app/src:/opt/osm-analytics-api/app/src
-  restart: always
-cron:
-  extends:
-    file: base.yml
-    service: cron
-  command: cron
-  links:
-    - redis
-  volumes:
-    - ./app/src:/opt/osm-analytics-api/app/src
-  restart: always
-redis:
-  extends:
-    file: base.yml
-    service: redis
-  restart: always
+version: '2'
+services:
+  api:
+    extends:
+      file: base.yml
+      service: base
+    ports:
+      - "35729:35729"
+    command: develop
+    environment:
+      - REDIS_PORT_6379_TCP_ADDR=redis
+      - REDIS_PORT_6379_TCP_PORT=6379
+    depends_on:
+      - redis
+    volumes:
+      - ./api/app/src:/opt/osm-analytics-api/app/src
+    restart: always
+  cron:
+    extends:
+      file: base.yml
+      service: cron
+    command: cron
+    environment:
+      - REDIS_PORT_6379_TCP_ADDR=redis
+      - REDIS_PORT_6379_TCP_PORT=6379
+    depends_on:
+      - redis
+    volumes:
+      - ./api/app/src:/opt/osm-analytics-api/app/src
+    restart: always
+  redis:
+    extends:
+      file: base.yml
+      service: redis
+    restart: always
+  nginx:
+    extends:
+      file: base.yml
+      service: nginx
+    restart: always
+    depends_on:
+      - api

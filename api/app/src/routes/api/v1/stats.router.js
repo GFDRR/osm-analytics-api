@@ -31,7 +31,7 @@ const areaByZoomTile = [
 
 class StatsRouter {
 
-  static async calculate(featureType, geometry, zoom) {
+  static async calculate(featureType, geometry, zoom, nocache=false) {
 
     const limits = {
       min_zoom: 1,
@@ -53,7 +53,7 @@ class StatsRouter {
     }
 
     const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(featureType, tiles, limits.max_zoom);
+    const response = await OSMService.summary(featureType, tiles.slice(0, 30), limits.max_zoom, nocache);
     return {
       [featureType]: response
     };
@@ -69,7 +69,7 @@ class StatsRouter {
       type: 'Polygon',
       coordinates: [coordinates]
     };
-    ctx.body = await StatsRouter.calculate(ctx.params.featureType, geometry);
+    ctx.body = await StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache);
   }
 
   static async bbox(ctx) {
@@ -94,7 +94,7 @@ class StatsRouter {
       promises.push(StatsRouter.calculate('highways', geometry));
       promises.push(StatsRouter.calculate('waterways', geometry));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -104,7 +104,7 @@ class StatsRouter {
   }
 
   static async country(ctx) {
-    logger.debug('Obtaining data by iso3 ', ctx.params.iso3);
+    logger.info('Obtaining data by iso3 ', ctx.params.iso3);
     let geometry = null;
     for(let i = 0, length = countries.features.length; i < length; i++) {
       if(countries.features[i].properties.iso === ctx.params.iso3) {
@@ -123,7 +123,7 @@ class StatsRouter {
       promises.push(StatsRouter.calculate('highways', geometry, 13));
       promises.push(StatsRouter.calculate('waterways', geometry, 13));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -140,13 +140,14 @@ class StatsRouter {
 
 router.use(async (ctx, next) => {
   const data = await redisService.getAsync(ctx.url);
-  if (data){
+  if (data && !ctx.query.nocache){
+    logger.info('Return caching response');
     ctx.body = JSON.parse(data);
     return;
   }
 
   await next();
-  if (ctx.body) {
+  if (ctx.body && !ctx.query.nocache) {
     logger.info(`Caching ${ctx.url}`);
     redisService.setex(ctx.url, JSON.stringify(ctx.body));
   }

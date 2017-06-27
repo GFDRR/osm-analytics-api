@@ -1,21 +1,35 @@
-base:
-  build: .
-  ports:
-    - "3000:3000"
-  container_name: osm-analytics-api
-  environment:
-    PORT: 3000
-    NODE_PATH: app/src
+version: '2'
+services:
+  base:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3000"
+    container_name: osm-analytics-api
+    environment:
+      PORT: 3000
+      NODE_PATH: app/src
 
-cron:
-  build: .
-  container_name: osm-analytics-cron
-  environment:
-    NODE_PATH: app/src
+  cron:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: osm-analytics-cron
+    environment:
+      NODE_PATH: app/src
 
-redis:
-  image: redis
-  container_name: osm-analytics-redis
-  ports:
-    - "6379:6379"
-  restart: always
+  redis:
+    image: redis
+    container_name: osm-analytics-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  nginx:
+    image: nginx
+    container_name: osm-analytics-nginx
+    volumes:
+      - "./nginx:/etc/nginx"
+    ports:
+      - "80:80"
