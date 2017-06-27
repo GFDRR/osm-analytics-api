@@ -20,8 +20,9 @@ node {
 
       if (env.BRANCH_NAME == "develop") {
         // alternative deployment pipeline for production
-        sh 'eval "$(ssh-agent -s)" && ssh-add -l'
-        sh 'ssh -v ubuntu@${OSMA_STAGING} /home/ubuntu/projects/osm-analytics-api/start.sh'
+        sshagent (credentials: ['osma_staging']) {
+          sh 'ssh -o StrictHostKeyChecking=no ubuntu@${OSMA_STAGING} "cd /home/ubuntu/projects/osm-analytics-api && ./start.sh"'
+        }
       } else {
 
       }
