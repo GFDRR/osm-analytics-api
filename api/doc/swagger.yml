@@ -17,6 +17,15 @@ tags:
 schemes:
 - "http"
 
+parameters:
+  feature_type:
+    name: "feature_type"
+    in: "path"
+    description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+    required: true
+    type: "string"
+    enum: [ all, buildings, highways]
+
 paths:
 
   /stats/{feature_type}/country/{iso3}:
@@ -27,11 +36,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "iso3"
         in: "path"
         description: "iso3 code of a country"
@@ -53,11 +58,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "polyline"
         in: "path"
         description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm)"
@@ -79,11 +80,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "minLng"
         in: "path"
         description: "Minimum longitude"
@@ -120,11 +117,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "project_id"
         in: "path"
         description: "id of HOT project"
