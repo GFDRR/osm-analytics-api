@@ -17,6 +17,15 @@ tags:
 schemes:
 - "http"
 
+parameters:
+  feature_type:
+    name: "feature_type"
+    in: "path"
+    description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+    required: true
+    type: "string"
+    enum: [all, buildings, highways]
+
 paths:
 
   /stats/{feature_type}/country/{iso3}:
@@ -27,11 +36,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "iso3"
         in: "path"
         description: "iso3 code of a country"
@@ -41,11 +46,11 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/FeatureStats"
+            $ref: "#/definitions/Stats"
         404:
           description: "Country not found"
 
-  /stats/{feature_type}/area/{polyline}:
+  /stats/{feature_type}/area/{polygon}:
     get:
       tags:
       - "stats"
@@ -53,12 +58,8 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
-        required: true
-        type: "string"
-      - name: "polyline"
+      - $ref: '#/parameters/feature_type'
+      - name: "polygon"
         in: "path"
         description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm)"
         required: true
@@ -67,11 +68,11 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/FeatureStats"
+            $ref: "#/definitions/Stats"
         413:
           description: "Encoded polyline is too big"
 
-  /stats/{feature_type}/bbox/{minLng}/{minLat}/{maxLng}/{maxLat}:
+  /stats/{feature_type}/bbox/{bounds}:
     get:
       tags:
       - "stats"
@@ -79,36 +80,17 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
+      - $ref: '#/parameters/feature_type'
+      - name: "bounds"
         in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
+        description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}"
         required: true
         type: "string"
-      - name: "minLng"
-        in: "path"
-        description: "Minimum longitude"
-        required: true
-        type: "number"
-      - name: "minLat"
-        in: "path"
-        description: "Minimum latitude"
-        required: true
-        type: "number"
-      - name: "maxLng"
-        in: "path"
-        description: "Maximum longitude"
-        required: true
-        type: "number"
-      - name: "maxLat"
-        in: "path"
-        description: "Maximum latitude"
-        required: true
-        type: "number"
       responses:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/FeatureStats"
+            $ref: "#/definitions/Stats"
         405:
           description: "Invalid bounding box"
 
@@ -120,11 +102,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "feature_type"
-        in: "path"
-        description: "A feature type (buildings, highways, etc). Use the /feature_types endpoint to get a list of feature types."
-        required: true
-        type: "string"
+      - $ref: '#/parameters/feature_type'
       - name: "project_id"
         in: "path"
         description: "id of HOT project"
@@ -135,7 +113,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/FeatureStats"
+            $ref: "#/definitions/Stats"
         404:
           description: "Project not found"
 
@@ -217,30 +195,21 @@ definitions:
       tag:
         type: "string"
 
-  Histogram:
-    type: "object"
-    properties:
-      values:
-        description: "an array of timestamps, user experiences, activity..."
-        type: "array"
-        items:
-          type: "integer"
-          format: "int32"
-
   User:
     type: "object"
     description: "An OSM user"
     properties:
       osm_id:
         type: "string"
-      name:
+      osm_name:
         type: "string"
-      num_features:
-        description: "Number of [feature] edited in this area"
+        description: "OSM display name. Might not be available for all users."
+      feature_value:
+        description: "Number of [feature type]/kms distance of [feature type] edited in this area"
         type: "integer"
         format: "int32"
       is_local:
-        description: "Is the user a local or remote mapper, as a confidence value between 0 and 1 (0: very likely to be a remote mapper, 1: very likely to be a local mapper)."
+        description: "Is the user a local or remote mapper, as a confidence value between 0 and 1 (0: very likely to be a remote mapper, 1: very likely to be a local mapper). Might not be available for all users."
         type: "integer"
         format: "int32"
   Experience:
@@ -257,7 +226,7 @@ definitions:
         description: Users with this experience
   Recency:
     type: "object"
-    description: "An OSM experience item"
+    description: "An OSM recency item"
     properties:
       day:
         type: "integer"
@@ -267,84 +236,43 @@ definitions:
         type: "integer"
         format: "int32"
         description: Num items this day
+
   FeatureStats:
     type: "object"
     properties:
+      users:
+        type: "array"
+        items:
+          $ref: "#/definitions/User"
+      experience:
+        type: "array"
+        items:
+          $ref: "#/definitions/Experience"
+      recency:
+        type: "array"
+        items:
+          $ref: "#/definitions/Recency"
+
+      user_experience_min:
+        type: "integer"
+        format: "int32"
+        description: Minimun experience for the feature
+      user_experience_max:
+        type: "integer"
+        format: "int32"
+        description: Maximum experience for the feature
+      user_experience_mean:
+        type: "integer"
+        format: "float"
+        description: Mean experience for the feature
+      count:
+        type: "integer"
+        format: "int32"
+        description: Number of [feature type]
+  Stats:
+    type: "object"
+    properties:
       buildings:
-        type: object
-        properties:
-          users:
-            type: "array"
-            items:
-              $ref: "#/definitions/User"
-          experience:
-            type: "array"
-            items:
-              $ref: "#/definitions/Experience"
-          recency:
-            type: "array"
-            items:
-              $ref: "#/definitions/Recency"
-
-          features:
-            type: "object"
-            properties:
-              userExperienceMin:
-                type: "integer"
-                format: "int32"
-                description: Minimun experience for the feature
-              userExperienceMax:
-                type: "integer"
-                format: "int32"
-                description: Maximun experience for the feature
-              userExperienceMean:
-                type: "integer"
-                format: "float"
-                description: Mean experience for the feature
-              num:
-                type: "integer"
-                format: "int32"
-                description: Num features
-              count:
-                type: "integer"
-                format: "int32"
-                description: num buildings
+        $ref: "#/definitions/FeatureStats"
       highways:
-        type: object
-        properties:
-          users:
-            type: "array"
-            items:
-              $ref: "#/definitions/User"
-          experience:
-            type: "array"
-            items:
-              $ref: "#/definitions/Experience"
-          recency:
-            type: "array"
-            items:
-              $ref: "#/definitions/Recency"
-
-          features:
-            type: "object"
-            properties:
-              userExperienceMin:
-                type: "integer"
-                format: "int32"
-                description: Minimun experience for the feature
-              userExperienceMax:
-                type: "integer"
-                format: "int32"
-                description: Maximun experience for the feature
-              userExperienceMean:
-                type: "integer"
-                format: "float"
-                description: Mean experience for the feature
-              num:
-                type: "integer"
-                format: "int32"
-                description: Num features
-              count:
-                type: "integer"
-                format: "int32"
-                description: length kms
+        $ref: "#/definitions/FeatureStats"

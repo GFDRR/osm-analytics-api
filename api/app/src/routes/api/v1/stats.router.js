@@ -153,8 +153,8 @@ router.use(async (ctx, next) => {
   }
 });
 
-router.get('/:featureType/area/:polyline', StatsRouter.area);
-router.get('/:featureType/bbox/:minLng/:minLat/:maxLng/:maxLat', StatsRouter.bbox);
+router.get('/:featureType/polygon/:polyline', StatsRouter.area);
+router.get('/:featureType/bbox/:minLng,:minLat,:maxLng,:maxLat', StatsRouter.bbox);
 router.get('/:featureType/country/:iso3', StatsRouter.country);
 router.get('/:featureType/project/:id', StatsRouter.project);
 
