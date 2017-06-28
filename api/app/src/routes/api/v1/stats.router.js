@@ -51,9 +51,8 @@ class StatsRouter {
     } else {
       limits.max_zoom = zoom;
     }
-
     const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(featureType, tiles.slice(0, 30), limits.max_zoom, nocache);
+    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache);
     return {
       [featureType]: response
     };
@@ -69,11 +68,28 @@ class StatsRouter {
       type: 'Polygon',
       coordinates: [coordinates]
     };
-    ctx.body = await StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache);
+
+    if (ctx.params.featureType === 'all') {
+      promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
+    } else {
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
+    }
+
+    const partialResults = await Promise.all(promises);
+    let finalResult = {};
+    partialResults.map(result => Object.assign(finalResult, result));
+    ctx.body = finalResult;
+
   }
 
   static async bbox(ctx) {
     logger.info('Obtaining data by bbox');
+    ctx.params.minLng = parseFloat(ctx.params.minLng);
+    ctx.params.maxLat = parseFloat(ctx.params.maxLat);
+    ctx.params.minLat = parseFloat(ctx.params.minLat);
+    ctx.params.maxLng = parseFloat(ctx.params.maxLng);
     const coordinates = [
       [
         [ctx.params.minLng, ctx.params.maxLat],
@@ -90,11 +106,11 @@ class StatsRouter {
 
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry));
-      promises.push(StatsRouter.calculate('highways', geometry));
-      promises.push(StatsRouter.calculate('waterways', geometry));
+      promises.push(StatsRouter.calculate('buildings', geometry, null,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null,  ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -119,11 +135,11 @@ class StatsRouter {
 
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, 13));
-      promises.push(StatsRouter.calculate('highways', geometry, 13));
-      promises.push(StatsRouter.calculate('waterways', geometry, 13));
+      promises.push(StatsRouter.calculate('buildings', geometry, 13, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null,  ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);

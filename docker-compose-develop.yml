@@ -4,8 +4,6 @@ services:
     extends:
       file: base.yml
       service: base
-    ports:
-      - "35729:35729"
     command: develop
     environment:
       - REDIS_PORT_6379_TCP_ADDR=redis
