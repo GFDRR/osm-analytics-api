@@ -37,7 +37,9 @@
   },
   "dependencies": {
     "@mapbox/tile-cover": "^3.0.2",
+    "@turf/area": "^4.4.0",
     "@turf/buffer": "^4.4.0",
+    "@turf/linestring-to-polygon": "^4.4.0",
     "@turf/simplify": "^4.4.0",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.5",

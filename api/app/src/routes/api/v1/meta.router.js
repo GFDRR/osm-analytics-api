@@ -4,8 +4,10 @@ const request = require('request-promise');
 const config = require('config');
 const countries = require('data/countries.geo.json');
 const polyline = require('polyline');
-const turf_buffer = require('@turf/buffer')
-const turf_simplify = require('@turf/simplify')
+const turf_buffer = require('@turf/buffer');
+const turf_simplify = require('@turf/simplify');
+const turf_area = require('@turf/area');
+const turf_lineStringToPolygon = require('@turf/linestring-to-polygon');
 
 const router = new Router({
   prefix: '/meta',
@@ -60,10 +62,12 @@ class MetaRouter {
     // the more complex the geometry, the higher tolerance will be
     const tolerance = maxPoints / 3000;
 
-    // TODO buffer size should depend on polygon area
+    // buffer size should depend on polygon area
+    const area = turf_area(turf_lineStringToPolygon(largestPolyGeoJSON));
+    let bufferKm = Math.pow(area, 1/3) / 500;
 
     // simplify geometry and draw a buffer around it to try to compensate for the 'lost' geometries
-    const finalGeoJSON = turf_buffer(turf_simplify(largestPolyGeoJSON, tolerance), 15, 'kilometers');
+    const finalGeoJSON = turf_buffer(turf_simplify(largestPolyGeoJSON, tolerance), bufferKm, 'kilometers');
     const finalGeometry = finalGeoJSON.geometry.coordinates[0];
 
     ctx.body = polyline.encode(finalGeometry);
