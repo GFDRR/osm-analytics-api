@@ -12,7 +12,7 @@
     "redis": {
       "host": null,
       "port": null,
-      "timeCache": 3600
+      "timeCache": 86400
     },
     "hotProjectsUrl": "https://s3.amazonaws.com/tm-projects-vt/hotprojects.geojson",
     "usersAPI": "http://whosthat.osmz.ru/whosthat.php?action=last&id=",
