@@ -38,6 +38,7 @@
   "dependencies": {
     "@mapbox/tile-cover": "^3.0.2",
     "@turf/buffer": "^4.4.0",
+    "@turf/intersect": "^4.4.0",
     "@turf/simplify": "^4.4.0",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.5",

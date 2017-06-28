@@ -2,6 +2,8 @@ const logger = require('logger');
 const request = require('request-promise');
 const tileService = require('services/tile.service');
 const config = require('config');
+const intersect = require('@turf/intersect');
+
 
 class OSMService {
 
@@ -58,7 +60,6 @@ class OSMService {
   }
 
   static summaryLevel12(feature, summary) {
-
     if (feature.properties._count) {
       summary.count += feature.properties._count;
     }
@@ -135,7 +136,7 @@ class OSMService {
     return arrayUsers;
   }
 
-  static async summary(layer, tiles, level, nocache)  {
+  static async summary(geometry, layer, tiles, level, nocache)  {
     logger.debug('Obtaining summary of ', tiles);
     let summary = {
       count: 0,
@@ -153,10 +154,12 @@ class OSMService {
         if (features) {
           for (let feature of features) {
             summary.num++;
-            if (level > 12) {
-              summary = OSMService.summaryLevel13(feature, summary);
-            } else {
-              summary = OSMService.summaryLevel12(feature, summary);
+            if (intersect(feature,{type: 'Feature', geometry })) {
+              if (tile[2] > 12) {
+                summary = OSMService.summaryLevel13(feature, summary);
+              } else {
+                summary = OSMService.summaryLevel12(feature, summary);
+              }
             }
           }
         }
@@ -180,6 +183,7 @@ class OSMService {
     summary.user_experience = summary.user_experience / summary.num;
 
     summary.users = await OSMService.manageUsers(summary.users);
+    delete summary.num;
     return summary;
   }
 
