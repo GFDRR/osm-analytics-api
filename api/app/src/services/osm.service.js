@@ -11,13 +11,13 @@ class OSMService {
       summary.count++;
     }
     if (feature.properties._userExperience) {
-      summary.userExperience += feature.properties._userExperience;
+      summary.user_experience += feature.properties._userExperience;
     }
-    if ((feature.properties._userExperience && feature.properties._userExperience < summary.userExperienceMin) || !summary.userExperienceMin) {
-      summary.userExperienceMin = feature.properties._userExperience;
+    if ((feature.properties._userExperience && feature.properties._userExperience < summary.user_experience_min) || !summary.user_experience_min) {
+      summary.user_experience_min = feature.properties._userExperience;
     }
-    if ((feature.properties._userExperience && feature.properties._userExperience > summary.userExperienceMax) || summary.userExperienceMax) {
-      summary.userExperienceMax = feature.properties._userExperience;
+    if ((feature.properties._userExperience && feature.properties._userExperience > summary.user_experience_max) || summary.user_experience_max) {
+      summary.user_experience_max = feature.properties._userExperience;
     }
 
     if (feature.properties._uid) {
@@ -63,13 +63,13 @@ class OSMService {
       summary.count += feature.properties._count;
     }
     if (feature.properties._userExperience) {
-      summary.userExperience += feature.properties._userExperience;
+      summary.user_experience += feature.properties._userExperience;
     }
-    if ((feature.properties._userExperienceMin && feature.properties._userExperienceMin < summary.userExperienceMin) || !summary.userExperienceMin) {
-      summary.userExperienceMin = feature.properties._userExperienceMin;
+    if ((feature.properties._userExperienceMin && feature.properties._userExperienceMin < summary.user_experience_min) || !summary.user_experience_min) {
+      summary.user_experience_min = feature.properties._userExperienceMin;
     }
-    if ((feature.properties._userExperienceMax && feature.properties._userExperienceMax > summary.userExperienceMax) || summary.userExperienceMax) {
-      summary.userExperienceMax = feature.properties._userExperienceMax;
+    if ((feature.properties._userExperienceMax && feature.properties._userExperienceMax > summary.user_experience_max) || summary.user_experienc_max) {
+      summary.user_experience_max = feature.properties._userExperienceMax;
     }
 
     //recency
@@ -114,13 +114,13 @@ class OSMService {
     if (users) {
       arrayUsers = Object.keys(users).map(key => {
         return {
-          id: key,
-          value: users[key]
+          osm_id: key,
+          feature_value: users[key]
         }
       }).sort((a, b) => {
-        if (a.value < b.value) {
+        if (a.feature_value < b.feature_value) {
           return 1;
-        } else if (a.value === b.value) {
+        } else if (a.feature_value === b.feature_value) {
           return 0;
         }
         return -1;
@@ -128,8 +128,8 @@ class OSMService {
 
       let usersIds = Object.keys(users);
       for (let i = 0, length = arrayUsers.length; i < length && i < 20; i++) {
-        let name = await OSMService.getUser(arrayUsers[i].id);
-        arrayUsers[i].name = name;
+        let osm_name = await OSMService.getUser(arrayUsers[i].osm_id);
+        arrayUsers[i].osm_name = osm_name;
       }
     }
     return arrayUsers;
@@ -139,9 +139,9 @@ class OSMService {
     logger.debug('Obtaining summary of ', tiles);
     let summary = {
       count: 0,
-      userExperienceMin: null,
-      userExperienceMax: null,
-      userExperience: 0,
+      user_experience_min: null,
+      user_experience_max: null,
+      user_experience: 0,
       num: 0,
       users: {}
     };
@@ -177,7 +177,7 @@ class OSMService {
         count_experience: summary.experience[experience]
       }));
     }
-    summary.userExperience = summary.userExperience / summary.num;
+    summary.user_experience = summary.user_experience / summary.num;
 
     summary.users = await OSMService.manageUsers(summary.users);
     return summary;
