@@ -1,4 +1,4 @@
-# osm analytics api 
+# osm analytics api
 
 [View the documentation for this
 API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/doc/swagger.yml)
@@ -26,7 +26,7 @@ cd osm-analytics-api
 
 ```
 
-Open [http://localhost/api/v1/meta/contries](http://localhost/api/v1/meta/countries)
+Open [http://localhost/api/v1/meta/countries](http://localhost/api/v1/meta/countries)
 
 ## Prod configuration
 
@@ -47,4 +47,3 @@ To have if after reboot add this line to /etc/sysctl.conf:
 vm.overcommit_memory=1
 
 ```
-
