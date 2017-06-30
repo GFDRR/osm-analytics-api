@@ -21,15 +21,16 @@ Refer to the corresponding Docker container files for a full list of the depende
 
 ## Getting started
 
-Before starting, Docker and Docker Compose installed and configured, and Control Tower running.
+Before starting, make sure you have Docker and Docker Compose installed and configured, and Control Tower running.
 
-You can the run the API using the following command 
+You can the run the API using the following command:
 
 ```bash
 ./api.sh develop
 ```
 
-Open [http://localhost/api/v1/meta/countries](http://localhost/api/v1/meta/countries)
+Open [http://localhost/api/v1/meta/countries](http://localhost/api/v1/meta/countries) to confirm the API is running.
+Refer to the specification above for a full list of available endpoints.
 
 ## Production configuration
 
