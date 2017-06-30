@@ -12,19 +12,23 @@ async function tick() {
     logger.info('Populating cache');
     await redisService.clearCache();
     for(let i = 0, length = countries.features.length; i < length; i++) {
-      logger.info(`Calculating country ${countries.features[i].properties.iso}`);
-      const ctx = {
-        params: {
-          iso3: countries.features[i].properties.iso,
-          featureType: 'all'
-        },
-        query: {
-          nocache: 'true'
-        }
-      };
-      await StatsRouter.country(ctx);
-      logger.info(`Saving in cache /stats/all/country/${ctx.params.iso3}`);
-      redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body));
+      try {
+        logger.info(`Calculating country ${countries.features[i].properties.iso}`);
+        const ctx = {
+          params: {
+            iso3: countries.features[i].properties.iso,
+            featureType: 'all'
+          },
+          query: {
+            nocache: 'true'
+          }
+        };
+        await StatsRouter.country(ctx);
+        logger.info(`Saving in cache /stats/all/country/${ctx.params.iso3}`);
+        redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body));
+      } catch(err) {
+        logger.error(err);
+      }
     }
     running = false;
     logger.info(`Cron finished!! ${Date.now() - time}`);
