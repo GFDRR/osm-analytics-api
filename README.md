@@ -1,49 +1,48 @@
-# osm analytics api
+# OpenStreetMap Analytics API
 
-[View the documentation for this
-API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/doc/swagger.yml)
+API for [http://osm-analytics.org/](http://osm-analytics.org/)
 
-1. [Getting Started](#getting-started)
-2. [Prod configuration](#prod-configuration)
+## Requirements
 
-## Getting Started
+- [Control Tower](https://github.com/control-tower/control-tower)
+- Docker + Docker Compose
 
-### OS X
+We recommend using Docker and Docker Compose for simplicity of setup. For native execution, you will also need:
+- Nodejs
+- Redis
+- Nginx
 
-**First, make sure that you have the [API gateway running
-locally](https://github.com/control-tower/control-tower).**
+Refer to the corresponding Docker container files for a full list of the dependencies
 
-We're using Docker which, luckily for you, means that getting the
-application running locally should be fairly painless. First, make sure
-that you have [Docker Compose](https://docs.docker.com/compose/install/)
-installed on your machine.
+## Specification
+
+[View the documentation for this API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/doc/swagger.yml)
+
+
+## Getting started
+
+Before starting, Docker and Docker Compose installed and configured, and Control Tower running.
+
+You can the run the API using the following command 
 
 ```bash
-
-git clone https://github.com/GFDRR/osm-analytics-api
-cd osm-analytics-api
 ./api.sh develop
-
 ```
 
 Open [http://localhost/api/v1/meta/countries](http://localhost/api/v1/meta/countries)
 
-## Prod configuration
-
+## Production configuration
 
 ### Redis
+
 Set overcommit_memory in your server to use the filesystem with redis
 
 ```bash
-
 sysctl vm.overcommit_memory=1
-
 ```
 
 To have if after reboot add this line to /etc/sysctl.conf:
 
 ```bash
-
 vm.overcommit_memory=1
-
 ```
