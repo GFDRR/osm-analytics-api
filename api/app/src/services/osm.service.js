@@ -153,13 +153,17 @@ class OSMService {
         const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
         if (features) {
           for (let feature of features) {
-            summary.num++;
-            if (intersect(feature,{type: 'Feature', geometry })) {
-              if (tile[2] > 12) {
-                summary = OSMService.summaryLevel13(feature, summary);
-              } else {
-                summary = OSMService.summaryLevel12(feature, summary);
+            try {
+              if (intersect(feature,{type: 'Feature', geometry })) {
+                summary.num++;
+                if (tile[2] > 12) {
+                  summary = OSMService.summaryLevel13(feature, summary);
+                } else {
+                  summary = OSMService.summaryLevel12(feature, summary);
+                }
               }
+            } catch (err) {
+              logger.error(err);
             }
           }
         }
