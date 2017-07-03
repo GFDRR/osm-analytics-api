@@ -152,8 +152,10 @@ class OSMService {
         //logger.debug('Obtaining tile ', tile);
         const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
         if (features) {
+          let i = 0;
           for (let feature of features) {
             try {
+              logger.info('Doing feature', i++);
               if (intersect(feature,{type: 'Feature', geometry })) {
                 summary.num++;
                 if (tile[2] > 12) {
