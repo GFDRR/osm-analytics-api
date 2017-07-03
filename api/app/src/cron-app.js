@@ -36,5 +36,4 @@ async function tick() {
 }
 
 logger.info('Cron started');
-const cron = new CronJob('00 15 12 * * *', tick, null, true, 'Europe/Madrid');  // eslint-disable-line no-new
-cron.start();
+const cron = new CronJob('00 15 15 * * *', tick, null, true, 'Europe/Madrid');  // eslint-disable-line no-new
