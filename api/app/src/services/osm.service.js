@@ -3,6 +3,12 @@ const request = require('request-promise');
 const tileService = require('services/tile.service');
 const config = require('config');
 const intersect = require('@turf/intersect');
+const inside = require('@turf/inside');
+const invariant = require('@turf/invariant');
+const helpers = require('@turf/helpers');
+const booleanContains = require('@turf/boolean-contains');
+const tilebelt = require('@mapbox/tilebelt');
+
 
 
 class OSMService {
@@ -146,17 +152,25 @@ class OSMService {
       num: 0,
       users: {}
     };
-
+    // console.log(tiles.length)
     for (let tile of tiles) {
       try {
-        //logger.debug('Obtaining tile ', tile);
+        logger.debug('Obtaining tile ', tile);
+        console.log(tile)
+        // z x y
         const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
+        // check if tile is entirely inside queried geometry
+        const tileGeoJSON = tilebelt.tileToGeoJSON(tile);
+        const isTileEntirelyInQueriedGeometry = booleanContains(geometry, tileGeoJSON);
+        console.log(booleanContains(geometry, tileGeoJSON))
         if (features) {
+
           let i = 0;
           for (let feature of features) {
             try {
-              logger.info('Doing feature', i++);
-              if (intersect(feature,{type: 'Feature', geometry })) {
+              const featureFirstPoint = helpers.point(feature.geometry.coordinates[0][0]);
+              const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
+              if (isFeatureInQueriedGeometry) {
                 summary.num++;
                 if (tile[2] > 12) {
                   summary = OSMService.summaryLevel13(feature, summary);

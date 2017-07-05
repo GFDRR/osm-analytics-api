@@ -37,8 +37,13 @@
   },
   "dependencies": {
     "@mapbox/tile-cover": "^3.0.2",
+    "@mapbox/tilebelt": "^1.0.1",
+    "@turf/boolean-contains": "^4.5.2",
     "@turf/buffer": "^4.4.0",
+    "@turf/helpers": "^4.5.2",
+    "@turf/inside": "^4.5.2",
     "@turf/intersect": "^4.4.0",
+    "@turf/invariant": "^4.5.2",
     "@turf/simplify": "^4.4.0",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.5",
