@@ -28,4 +28,4 @@ services:
     volumes:
       - "./nginx:/etc/nginx"
     ports:
-      - "90:80"
+      - "80:80"
