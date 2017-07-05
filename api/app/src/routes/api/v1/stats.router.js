@@ -51,7 +51,10 @@ class StatsRouter {
     } else {
       limits.max_zoom = zoom;
     }
-    const tiles = cover.tiles(geometry, limits);
+    const tiles = cover.tiles(geometry, {
+      min_zoom: 13,
+      max_zoom: 13
+    });
     const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache);
     return {
       [featureType]: response
