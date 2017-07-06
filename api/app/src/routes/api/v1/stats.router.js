@@ -143,7 +143,7 @@ class StatsRouter {
       promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache));
       promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -160,11 +160,11 @@ class StatsRouter {
 
 router.use(async (ctx, next) => {
   const data = await redisService.getAsync(ctx.url);
-  // if (data && !ctx.query.nocache){
-  //   logger.info('Return caching response');
-  //   ctx.body = JSON.parse(data);
-  //   return;
-  // }
+  if (data && !ctx.query.nocache){
+    logger.info('Return caching response');
+    ctx.body = JSON.parse(data);
+    return;
+  }
 
   await next();
   if (ctx.body && !ctx.query.nocache) {
