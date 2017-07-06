@@ -47,3 +47,11 @@ To have if after reboot add this line to /etc/sysctl.conf:
 ```bash
 vm.overcommit_memory=1
 ```
+
+#### Clear cache
+
+```
+docker exec -it [docker hash] bash
+redis-cli
+flushall
+```
