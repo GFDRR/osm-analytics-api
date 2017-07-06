@@ -33,7 +33,7 @@ class PBFService {
   static async parseTile(data, z, x, y) {
 
     let buffer = data.tile;
-    if (data.headers['content-encoding'] === 'gzip') {
+    if (data.headers['content-encoding'] === 'gzip' || data.headers['Content-Encoding'] === 'gzip') {
       buffer = await PBFService.uncompress(data.tile);
     }
     return PBFService.decode(buffer, z, x, y);

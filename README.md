@@ -4,7 +4,6 @@ API for [http://osm-analytics.org/](http://osm-analytics.org/)
 
 ## Requirements
 
-- [Control Tower](https://github.com/control-tower/control-tower)
 - Docker + Docker Compose
 
 We recommend using Docker and Docker Compose for simplicity of setup. For native execution, you will also need:
@@ -46,4 +45,12 @@ To have if after reboot add this line to /etc/sysctl.conf:
 
 ```bash
 vm.overcommit_memory=1
+```
+
+#### Clear cache
+
+```
+docker exec -it [docker hash] bash
+redis-cli
+flushall
 ```
