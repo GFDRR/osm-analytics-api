@@ -1,6 +1,6 @@
 const logger = require('logger');
 const request = require('request-promise');
-const tileService = require('services/tile.service');
+const tileService = require('services/mbtile.service');
 const config = require('config');
 const intersect = require('@turf/intersect');
 const inside = require('@turf/inside');
@@ -154,7 +154,7 @@ class OSMService {
   }
 
   static async summary(geometry, layer, tiles, level, nocache)  {
-    logger.debug('Obtaining summary of ', tiles);
+    logger.info('Obtaining summary of ', tiles.length);
     let summary = {
       count: 0,
       user_experience_min: null,
@@ -163,17 +163,25 @@ class OSMService {
       num: 0,
       top_users: {}
     };
-    console.log('NUM OF TILES:' , tiles.length);
+
     for (let tile of tiles) {
       try {
         logger.debug('Obtaining tile ', tile);
-        console.log(tile)
         // z x y
-        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
+        const features = await tileService.getTile(tile[2], tile[0], tile[1], layer, nocache);
         // check if tile is entirely inside queried geometry
         const tileGeoJSON = tilebelt.tileToGeoJSON(tile);
-        const isTileEntirelyInQueriedGeometry = booleanContains(geometry, tileGeoJSON);
-        console.log(booleanContains(geometry, tileGeoJSON))
+        let isTileEntirelyInQueriedGeometry = false;
+        if (geometry.type === 'MultiPolygon'){
+          for (let coordinates of geometry.coordinates){
+            isTileEntirelyInQueriedGeometry = booleanContains({type: 'Polygon', coordinates}, tileGeoJSON);
+            if (isTileEntirelyInQueriedGeometry){
+              break;
+            }
+          }
+        } else {
+          isTileEntirelyInQueriedGeometry = booleanContains(geometry, tileGeoJSON);
+        }
         if (features) {
 
           let i = 0;

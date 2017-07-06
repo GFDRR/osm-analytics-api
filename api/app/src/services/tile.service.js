@@ -15,7 +15,7 @@ class TileService {
   constructor() {}
 
 
-  async getTileServer(z, x, y, layer = 'buildings', nocache=false) {
+  async getTile(z, x, y, layer = 'buildings', nocache=false) {
     let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
     if (data && !nocache) {
       if (data === 'empty'){
@@ -50,20 +50,6 @@ class TileService {
         redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');
       }
     }
-  }
-  async getTile(z, x, y) {
-    return new Promise((resolve, reject) => {
-      this.source.getTile(z, x, y, function (err, tile, headers) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({
-            tile,
-            headers
-          });
-        }
-      });
-    })
   }
 
 }
