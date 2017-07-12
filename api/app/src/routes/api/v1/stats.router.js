@@ -51,7 +51,10 @@ class StatsRouter {
     } else {
       limits.max_zoom = zoom;
     }
-    const tiles = cover.tiles(geometry, limits);
+    const tiles = cover.tiles(geometry, {
+      min_zoom: 13,
+      max_zoom: 13
+    });
     const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache);
     return {
       [featureType]: response
@@ -69,12 +72,13 @@ class StatsRouter {
       coordinates: [coordinates]
     };
 
+    const promises = [];
     if (ctx.params.featureType === 'all') {
       promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache));
       promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache));
       promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null, ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -110,7 +114,7 @@ class StatsRouter {
       promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache));
       promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);
@@ -139,7 +143,7 @@ class StatsRouter {
       promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache));
       promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache));
     }
 
     const partialResults = await Promise.all(promises);

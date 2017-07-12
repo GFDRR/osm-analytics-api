@@ -214,57 +214,74 @@ definitions:
         format: "int32"
   Experience:
     type: "object"
-    description: "An OSM experience item"
     properties:
       experience:
         type: "integer"
         format: "int32"
         description: Value between 1 - 12
-      count_experience:
+      count_users:
         type: "integer"
         format: "int32"
         description: Users with this experience
-  Recency:
+  ActivityCount:
     type: "object"
-    description: "An OSM recency item"
     properties:
       day:
         type: "integer"
         format: "int32"
-        description: Timestamp with the day
-      count_day:
+        description: Timestamp of the day
+      count_features:
         type: "integer"
         format: "int32"
-        description: Num items this day
+        description: Number of items/km of lines for this day
+  ActivityUsers:
+    type: "object"
+    properties:
+      day:
+        type: "integer"
+        format: "int32"
+        description: Timestamp of the day
+      count_users:
+        type: "integer"
+        format: "int32"
+        description: Number of distinct users for this day
 
   FeatureStats:
     type: "object"
     properties:
-      users:
+      top_users:
+        description: "A list of the users that edited features in this area"
         type: "array"
         items:
           $ref: "#/definitions/User"
       experience:
         type: "array"
+        description: "User experience histogram (feature count per level of experience)"
         items:
           $ref: "#/definitions/Experience"
-      recency:
+      activity_count:
         type: "array"
+        description: "Activity histogram (feature count/length) organized by days"
         items:
-          $ref: "#/definitions/Recency"
+          $ref: "#/definitions/ActivityCount"
+      activity_users:
+        type: "array"
+        description: "Activity histogram (distinct users count) organized by days"
+        items:
+          $ref: "#/definitions/ActivityUsers"
 
       user_experience_min:
         type: "integer"
         format: "int32"
-        description: Minimun experience for the feature
+        description: Minimun experience for the area
       user_experience_max:
         type: "integer"
         format: "int32"
-        description: Maximum experience for the feature
+        description: Maximum experience for the area
       user_experience_mean:
         type: "integer"
         format: "float"
-        description: Mean experience for the feature
+        description: Mean experience for the area
       count:
         type: "integer"
         format: "int32"

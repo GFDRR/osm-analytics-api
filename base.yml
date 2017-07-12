@@ -27,5 +27,3 @@ services:
     container_name: osm-analytics-nginx
     volumes:
       - "./nginx:/etc/nginx"
-    ports:
-      - "80:80"
