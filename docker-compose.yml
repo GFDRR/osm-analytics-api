@@ -5,6 +5,8 @@ services:
       file: base.yml
       service: base
     command: develop
+    ports:
+      - 3100:3000
     environment:
       - REDIS_PORT_6379_TCP_ADDR=redis
       - REDIS_PORT_6379_TCP_PORT=6379
@@ -31,12 +33,3 @@ services:
       file: base.yml
       service: redis
     restart: always
-  nginx:
-    extends:
-      file: base.yml
-      service: nginx
-    restart: always
-    ports:
-      - 80:80
-    depends_on:
-      - api

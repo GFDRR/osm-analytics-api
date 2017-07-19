@@ -12,45 +12,11 @@ const router = new Router({
 });
 
 
-const areaByZoomTile = [
-  1603319479926784,//0
-  400829869981696,//1
-  100207467495424,//2
-  25051866873856,//3
-  6262966718464,//4
-  1565741679616,//5
-  391435419904,//6
-  97858854976,//7
-  24464713744,//8
-  6116178436,//9
-  1529044609,//10
-  382261152.25,//11
-  95565288.0625,//12
-  23891322.015625//13
-];
-
 class StatsRouter {
 
   static async calculate(featureType, geometry, zoom, nocache=false) {
 
-    const limits = {
-      min_zoom: 1,
-      max_zoom: 10
-    };
     logger.debug('Obtaining tiles');
-
-    if (!zoom){
-      const areaGeom = area(geometry);
-      const areaByTile = areaGeom / 16;
-      for (let i = 0, length = areaByZoomTile.length; i < length; i++) {
-        if (areaByZoomTile[i] < areaByTile){
-          limits.max_zoom = i;
-          break;
-        }
-      }
-    } else {
-      limits.max_zoom = zoom;
-    }
     const tiles = cover.tiles(geometry, {
       min_zoom: 13,
       max_zoom: 13

@@ -21,9 +21,3 @@ services:
     image: redis
     container_name: osm-analytics-redis
     restart: always
-
-  nginx:
-    image: nginx
-    container_name: osm-analytics-nginx
-    volumes:
-      - "./nginx:/etc/nginx"
