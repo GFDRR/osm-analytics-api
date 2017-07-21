@@ -149,8 +149,9 @@ class OSMService {
         let osm_name = await OSMService.getUser(arrayUsers[i].osm_id);
         arrayUsers[i].osm_name = osm_name;
       }
+
     }
-    return arrayUsers;
+    return arrayUsers.slice(0, 100);
   }
 
   static async summary(geometry, layer, tiles, level, nocache)  {

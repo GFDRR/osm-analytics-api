@@ -35,7 +35,25 @@ class TileService {
     });
   }
 
-
+  async getTileNotParse(z, x, y, layer = 'buildings') {
+    return new Promise((resolve, reject) => {
+        if (['buildings', 'highways'].indexOf(layer) > -1) {
+          logger.debug(parseInt(z), parseInt(x), parseInt(y));
+          this.source[layer].getTile(parseInt(z), parseInt(x), parseInt(y), function (err, tile, headers) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({
+                tile,
+                headers
+              });
+            }
+          });
+        } else {
+          reject();
+        }
+      });
+  }
 
   async getTile(z, x, y, layer = 'buildings', nocache = false) {
     let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
