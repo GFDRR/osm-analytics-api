@@ -17,10 +17,11 @@ class StatsRouter {
   static async calculate(featureType, geometry, zoom, nocache=false) {
 
     logger.debug('Obtaining tiles');
-    const tiles = cover.tiles(geometry, {
+    const limits = {
       min_zoom: 13,
       max_zoom: 13
-    });
+    };
+    const tiles = cover.tiles(geometry, limits);
     const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache);
     return {
       [featureType]: response
