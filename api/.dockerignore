@@ -1,2 +1,3 @@
 app/src/data/mbtiles
-app/src/data/*.mbtiles
+app/src/data/*.mbtiles*
+*.mbtiles*
