@@ -4,13 +4,13 @@ services:
     extends:
       file: base.yml
       service: base
-    command: develop
+    command: start
     ports:
       - 3000:3000
     environment:
       REDIS_PORT_6379_TCP_ADDR: redis
       REDIS_PORT_6379_TCP_PORT: 6379
-      NODE_ENV: staging
+      NODE_ENV: prod
     depends_on:
       - redis
     volumes:
@@ -20,11 +20,11 @@ services:
     extends:
       file: base.yml
       service: cron
-    command: cron
+    command: start-cron
     environment:
       REDIS_PORT_6379_TCP_ADDR: redis
       REDIS_PORT_6379_TCP_PORT: 6379
-      NODE_ENV: staging
+      NODE_ENV: prod
     depends_on:
       - redis
     volumes:
