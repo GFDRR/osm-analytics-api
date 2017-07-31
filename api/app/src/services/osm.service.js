@@ -196,7 +196,7 @@ class OSMService {
               } else {
                 point = feature.geometry.coordinates;
               }
-              const featureFirstPoint = helpers.point(feature.geometry.coordinates[0][0]);
+              const featureFirstPoint = helpers.point(point);
               const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
               if (isFeatureInQueriedGeometry) {
                 summary.num++;
