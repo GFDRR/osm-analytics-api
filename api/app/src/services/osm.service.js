@@ -188,6 +188,14 @@ class OSMService {
           let i = 0;
           for (let feature of features) {
             try {
+              let point = null;
+              if (feature.geometry.toLowerCase() === 'polygon'){
+                point = feature.geometry.coordinates[0][0];
+              } else if (feature.geometry.toLowerCase() === 'linestring') {
+                point = feature.geometry.coordinates[0];
+              } else {
+                point = feature.geometry.coordinates;
+              }
               const featureFirstPoint = helpers.point(feature.geometry.coordinates[0][0]);
               const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
               if (isFeatureInQueriedGeometry) {
