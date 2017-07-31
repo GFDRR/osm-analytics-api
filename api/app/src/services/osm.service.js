@@ -189,9 +189,9 @@ class OSMService {
           for (let feature of features) {
             try {
               let point = null;
-              if (feature.geometry.toLowerCase() === 'polygon'){
+              if (feature.geometry.type.toLowerCase() === 'polygon'){
                 point = feature.geometry.coordinates[0][0];
-              } else if (feature.geometry.toLowerCase() === 'linestring') {
+              } else if (feature.geometry.type.toLowerCase() === 'linestring') {
                 point = feature.geometry.coordinates[0];
               } else {
                 point = feature.geometry.coordinates;
