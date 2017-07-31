@@ -8,8 +8,9 @@ services:
     ports:
       - 3000:3000
     environment:
-      - REDIS_PORT_6379_TCP_ADDR=redis
-      - REDIS_PORT_6379_TCP_PORT=6379
+      REDIS_PORT_6379_TCP_ADDR: redis
+      REDIS_PORT_6379_TCP_PORT: 6379
+      NODE_ENV: staging
     depends_on:
       - redis
     volumes:
@@ -21,8 +22,9 @@ services:
       service: cron
     command: cron
     environment:
-      - REDIS_PORT_6379_TCP_ADDR=redis
-      - REDIS_PORT_6379_TCP_PORT=6379
+      REDIS_PORT_6379_TCP_ADDR: redis
+      REDIS_PORT_6379_TCP_PORT: 6379
+      NODE_ENV: staging
     depends_on:
       - redis
     volumes:
