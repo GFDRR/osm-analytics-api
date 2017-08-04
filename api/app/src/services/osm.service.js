@@ -76,57 +76,6 @@ class OSMService {
 
   }
 
-  static summaryLevel12(feature, summary) {
-    if (feature.properties._count) {
-      summary.count += feature.properties._count;
-    }
-    if (feature.properties._userExperience) {
-      summary.user_experience += feature.properties._userExperience;
-    }
-    if ((feature.properties._userExperienceMin && feature.properties._userExperienceMin < summary.user_experience_min) || !summary.user_experience_min) {
-      summary.user_experience_min = feature.properties._userExperienceMin;
-    }
-    if ((feature.properties._userExperienceMax && feature.properties._userExperienceMax > summary.user_experience_max) || summary.user_experienc_max) {
-      summary.user_experience_max = feature.properties._userExperienceMax;
-    }
-
-    //activity_count
-    let samples = feature.properties._timestamps.split(';').map(Number);
-    let countPerSample = feature.properties._count / samples.length;
-    if (!summary.activity_count) {
-      summary.activity_count = {};
-    }
-    samples.forEach(function (sample) {
-      let day = new Date(sample * 1000)
-      day.setMilliseconds(0)
-      day.setSeconds(0)
-      day.setMinutes(0)
-      day.setHours(0)
-      day = +day
-      if (!summary.activity_count[day]) {
-        summary.activity_count[day] = 0;
-      }
-      summary.activity_count[day] += countPerSample;
-    });
-
-    //experience
-    samples = feature.properties._userExperiences.split(';').map(Number);
-
-    countPerSample = feature.properties._count / samples.length;
-    if (!summary.experience) {
-      summary.experience = {};
-    }
-    samples.forEach(function (sample) {
-      let experienceBin = Math.min(100, Math.floor(Math.log2(sample)));
-      if (!summary.experience[experienceBin]) {
-        summary.experience[experienceBin] = 0;
-      }
-      summary.experience[experienceBin] += countPerSample;
-    });
-
-    return summary;
-  }
-
   static async manageUsers(users) {
     let arrayUsers = [];
     if (users) {
@@ -154,8 +103,8 @@ class OSMService {
     return arrayUsers.slice(0, 100);
   }
 
-  static async summary(geometry, layer, tiles, level, nocache)  {
-    logger.info('Obtaining summary of ', tiles.length);
+  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate)  {
+    logger.info('Obtaining summary of ', tiles.length, minDate, maxDate);
     let summary = {
       count: 0,
       user_experience_min: null,
@@ -187,27 +136,25 @@ class OSMService {
 
           let i = 0;
           for (let feature of features) {
-            try {
-              let point = null;
-              if (feature.geometry.type.toLowerCase() === 'polygon'){
-                point = feature.geometry.coordinates[0][0];
-              } else if (feature.geometry.type.toLowerCase() === 'linestring') {
-                point = feature.geometry.coordinates[0];
-              } else {
-                point = feature.geometry.coordinates;
-              }
-              const featureFirstPoint = helpers.point(point);
-              const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
-              if (isFeatureInQueriedGeometry) {
-                summary.num++;
-                if (tile[2] > 12) {
-                  summary = OSMService.summaryLevel13(feature, summary);
+            if (!minDate || !maxDate || (feature.properties._timestamp >= minDate && feature.properties._timestamp <= maxDate)) {
+              try {
+                let point = null;
+                if (feature.geometry.type.toLowerCase() === 'polygon'){
+                  point = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type.toLowerCase() === 'linestring') {
+                  point = feature.geometry.coordinates[0];
                 } else {
-                  summary = OSMService.summaryLevel12(feature, summary);
+                  point = feature.geometry.coordinates;
                 }
+                const featureFirstPoint = helpers.point(point);
+                const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
+                if (isFeatureInQueriedGeometry) {
+                  summary.num++;
+                  summary = OSMService.summaryLevel13(feature, summary);
+                }
+              } catch (err) {
+                //logger.error(err);
               }
-            } catch (err) {
-              //logger.error(err);
             }
           }
         }

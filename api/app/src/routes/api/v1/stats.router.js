@@ -14,7 +14,7 @@ const router = new Router({
 
 class StatsRouter {
 
-  static async calculate(featureType, geometry, zoom, nocache=false) {
+  static async calculate(featureType, geometry, zoom, nocache=false, minDate=null, maxDate=null) {
 
     logger.debug('Obtaining tiles');
     const limits = {
@@ -22,7 +22,7 @@ class StatsRouter {
       max_zoom: 13
     };
     const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache);
+    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate);
     return {
       [featureType]: response
     };
@@ -38,14 +38,28 @@ class StatsRouter {
       type: 'Polygon',
       coordinates: [coordinates]
     };
+    let minDate, maxDate = null;
+    try {
+      if (ctx.query.period) {
+        const periods = ctx.query.period.split(',');
+        if (!periods || periods.length !== 2) {
+          throw new Error('Period not valid');
+        }
+        minDate = new Date(periods[0]).getTime() / 1000;
+        maxDate = new Date(periods[1]).getTime() / 1000;
+      }
+    } catch(e) {
+      ctx.throw(400, 'query param \'period\' not valid');
+      return;
+    }
 
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache));
-      promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache));
-      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null, ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null, ctx.query.nocache, minDate, maxDate));
     }
 
     const partialResults = await Promise.all(promises);
@@ -75,13 +89,28 @@ class StatsRouter {
       coordinates,
     };
 
+    let minDate, maxDate = null;
+    try {
+      if (ctx.query.period) {
+        const periods = ctx.query.period.split(',');
+        if (!periods || periods.length !== 2) {
+          throw new Error('Period not valid');
+        }
+        minDate = new Date(periods[0]).getTime() / 1000;
+        maxDate = new Date(periods[1]).getTime() / 1000;
+      }
+    } catch(e) {
+      ctx.throw(400, 'query param \'period\' not valid');
+      return;
+    }
+
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, null,  ctx.query.nocache));
-      promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache));
-      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('buildings', geometry, null,  ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache, minDate, maxDate));
     }
 
     const partialResults = await Promise.all(promises);
@@ -103,14 +132,28 @@ class StatsRouter {
       ctx.throw(404, 'Iso not found');
       return;
     }
+    let minDate, maxDate = null;
+    try {
+      if (ctx.query.period) {
+        const periods = ctx.query.period.split(',');
+        if (!periods || periods.length !== 2) {
+          throw new Error('Period not valid');
+        }
+        minDate = new Date(periods[0]).getTime() / 1000;
+        maxDate = new Date(periods[1]).getTime() / 1000;
+      }
+    } catch(e) {
+      ctx.throw(400, 'query param \'period\' not valid');
+      return;
+    }
 
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, 13, ctx.query.nocache));
-      promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache));
-      promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache));
+      promises.push(StatsRouter.calculate('buildings', geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache, minDate, maxDate));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache, minDate, maxDate));
     }
 
     const partialResults = await Promise.all(promises);
