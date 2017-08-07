@@ -14,7 +14,8 @@ class PbfRouter {
       ctx.set(data.headers);
     } catch(err) {
       logger.error('Tile does not exist', err);
-      ctx.throw(404, 'Tile does not exist');
+      ctx.status = 404;
+      ctx.body = 'Tile does not exist';
       return;
     }
   }
