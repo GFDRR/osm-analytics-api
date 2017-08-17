@@ -46,7 +46,7 @@ class TileService {
 
   async getTileNotParse(z, x, y, layer = 'buildings') {
     return new Promise((resolve, reject) => {
-        if (['buildings', 'highways'].indexOf(layer) > -1) {
+        if (['buildings', 'highways', 'waterways'].indexOf(layer) > -1) {
           logger.debug(parseInt(z), parseInt(x), parseInt(y));
           this.source[layer].getTile(parseInt(z), parseInt(x), parseInt(y), function (err, tile, headers) {
             if (err) {
@@ -75,7 +75,7 @@ class TileService {
     logger.debug(`Cache fail ${layer}/${z}/${x}/${y}`);
     try {
       const res = await new Promise((resolve, reject) => {
-        if (['buildings', 'highways'].indexOf(layer) > -1) {
+        if (['buildings', 'highways', 'waterways'].indexOf(layer) > -1) {
           this.source[layer].getTile(z, x, y, function (err, tile, headers) {
             if (err) {
               reject(err);
