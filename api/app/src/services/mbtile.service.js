@@ -33,6 +33,15 @@ class TileService {
       logger.info('Highways mbtile loaded correctly!!!');
       this.source.highways = source;
     });
+    pathMbtile = path.resolve(`${__dirname}/../data/waterways.mbtiles`);
+    tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
+      if (err) {
+        logger.error(err);
+        process.exit(1);
+      }
+      logger.info('waterways mbtile loaded correctly!!!');
+      this.source.waterways = source;
+    });
   }
 
   async getTileNotParse(z, x, y, layer = 'buildings') {
