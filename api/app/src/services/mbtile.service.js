@@ -93,7 +93,7 @@ class TileService {
   loadTile(pathFile, name)  {
     tilelive.load(`mbtiles://${path}`, (err, source) => {
       if (err) {
-        logger.error(err);
+        logger.error('Error opening' + name, err);
         process.exit(1);
       }
       logger.info(name, ' mbtile loaded correctly!!!');
