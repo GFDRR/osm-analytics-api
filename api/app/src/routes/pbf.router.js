@@ -20,7 +20,7 @@ class PbfRouter {
     }
   }
 
-  static async pbf(ctx) {
+  static async historic(ctx) {
     logger.info(`Obtaining tile of year ${ctx.params.year} and layer: ${ctx.params.layer} - z: ${ctx.params.z}; x: ${ctx.params.x}; y: ${ctx.params.y}`)
     try {
       const data = await tileService.getTileNotParse(ctx.params.z, ctx.params.x, ctx.params.y, `${ctx.params.layer}-${ctx.params-year}`);
