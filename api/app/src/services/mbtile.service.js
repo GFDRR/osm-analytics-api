@@ -90,7 +90,7 @@ class TileService {
   }
 
   loadTile(pathFile, name)  {
-    pathMbtile = path.resolve(`${__dirname}/../data/buildings.mbtiles`);
+    let pathMbtile = path.resolve(`${__dirname}/../data/buildings.mbtiles`);
     tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
       if (err) {
         logger.error('Error opening' + name, err);
