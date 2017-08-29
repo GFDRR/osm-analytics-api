@@ -84,14 +84,14 @@ class TileService {
 
   constructor() {
     this.source = {};
-    let pathMbtile = path.resolve(`${__dirname}/../data/buildings.mbtiles`);
     loadTiles.map(tile => {
       this.loadTile(tile.path, tile.name);
     });
   }
 
   loadTile(pathFile, name)  {
-    tilelive.load(`mbtiles://${path}`, (err, source) => {
+    pathMbtile = path.resolve(`${__dirname}/../data/buildings.mbtiles`);
+    tilelive.load(`mbtiles://${pathMbtile}`, (err, source) => {
       if (err) {
         logger.error('Error opening' + name, err);
         process.exit(1);
