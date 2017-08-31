@@ -8,7 +8,7 @@ info:
     url: "http://vizzuality.com"
   license:
     name: "MIT"
-basePath: "/api/v1"
+
 tags:
 - name: "stats"
   description: "Core stats"
@@ -29,8 +29,91 @@ parameters:
     enum: [all, buildings, highways, waterways]
 
 paths:
-
-  /stats/{feature_type}/country/{iso3}:
+  /{feature_type}/{z}/{x}/{y}.pbf:
+    get:
+      tags:
+      - "tiles"
+      summary: "Get pfb tile of the current year"
+      produces:
+      - "application/protobuf"
+      parameters:
+      - $ref: '#/parameters/feature_type'
+      - name: "z"
+        in: "path"
+        description: "Zoom level"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+        maximum: 13
+      - name: "x"
+        in: "path"
+        description: "Position X"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      - name: "y"
+        in: "path"
+        description: "Position Y"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: file
+        404:
+          description: "Tile not found"
+  /{year}/{feature_type}/{z}/{x}/{y}.pbf:
+    get:
+      tags:
+      - "tiles"
+      summary: "Get pfb tile of the selected year"
+      produces:
+      - "application/protobuf"
+      parameters:
+      - $ref: '#/parameters/feature_type'
+      - name: "year"
+        in: "path"
+        description: "Year. "
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 2007
+        maximum: 2016
+      - name: "z"
+        in: "path"
+        description: "Zoom level"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+        maximum: 13
+      - name: "x"
+        in: "path"
+        description: "X position"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      - name: "y"
+        in: "path"
+        description: "Y position"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: file
+        404:
+          description: "Tile not found"
+  /api/v1/stats/{feature_type}/country/{iso3}:
     get:
       tags:
       - "stats"
@@ -52,7 +135,7 @@ paths:
         404:
           description: "Country not found"
 
-  /stats/{feature_type}/polygon/{polygon}:
+  /api/v1/stats/{feature_type}/polygon/{polygon}:
     get:
       tags:
       - "stats"
@@ -74,7 +157,7 @@ paths:
         413:
           description: "Encoded polyline is too big"
 
-  /stats/{feature_type}/bbox/{bounds}:
+  /api/v1/stats/{feature_type}/bbox/{bounds}:
     get:
       tags:
       - "stats"
@@ -96,7 +179,7 @@ paths:
         405:
           description: "Invalid bounding box"
 
-  /meta/countries:
+  /api/v1/meta/countries:
     get:
       tags:
       - "meta"
@@ -111,7 +194,7 @@ paths:
             items:
               $ref: "#/definitions/Country"
 
-  /meta/country_polyline/{iso3}:
+  /api/v1/meta/country_polyline/{iso3}:
     get:
       tags:
       - "meta"
@@ -131,7 +214,7 @@ paths:
             type: "string"
 
 
-  /meta/feature-types:
+  /api/v1/meta/feature-types:
     get:
       tags:
       - "meta"
@@ -211,27 +294,14 @@ definitions:
   FeatureStats:
     type: "object"
     properties:
-      count:
-        type: "integer"
-        format: "int32"
-        description: Number of features
       top_users:
         type: "array"
         items:
           $ref: "#/definitions/TopUser"
-      user_experience_min:
-        type: "integer"
-        format: "int32"
-        description: Number of features
-      user_experience_max:
-        type: "integer"
-        format: "int32"
-        description: Number of features
       user_experience:
         type: "array"
         items:
           $ref: "#/definitions/ActivityUsers"
-
       user_experience_min:
         type: "integer"
         format: "int32"
