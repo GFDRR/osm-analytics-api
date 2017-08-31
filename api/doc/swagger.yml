@@ -37,7 +37,12 @@ paths:
       produces:
       - "application/protobuf"
       parameters:
-      - $ref: '#/parameters/feature_type'
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+        required: true
+        type: "string"
+        enum: [buildings, highways, waterways]
       - name: "z"
         in: "path"
         description: "Zoom level"
@@ -75,7 +80,12 @@ paths:
       produces:
       - "application/protobuf"
       parameters:
-      - $ref: '#/parameters/feature_type'
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+        required: true
+        type: "string"
+        enum: [buildings, highways, waterways]
       - name: "year"
         in: "path"
         description: "Year. "
@@ -146,7 +156,7 @@ paths:
       - $ref: '#/parameters/feature_type'
       - name: "polygon"
         in: "path"
-        description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm)"
+        description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm). Example: n~z%257BLypvpB%257BhcF%253F%253Facy%2540fobDdvO"
         required: true
         type: "string"
       responses:
@@ -168,7 +178,7 @@ paths:
       - $ref: '#/parameters/feature_type'
       - name: "bounds"
         in: "path"
-        description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}"
+        description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}. Example: -72.88824,18.63453,-71.71930,18.93214"
         required: true
         type: "string"
       responses:
