@@ -1,17 +1,19 @@
 swagger: "2.0"
 info:
-  description: "An API to consume OSM statistics as in the OSM Analytics client"
-  version: "0.0.1"
+  description: "An API to serve OSM analytics data and statistics"
+  version: "1.0.0"
   title: "OSM Analytics API"
   contact:
     name: "Vizzuality"
-    url: "http://vizzuality.com"
+    url: "http://osm-analytics.org"
   license:
     name: "MIT"
 
 tags:
 - name: "stats"
   description: "Core stats"
+- name: "tiles"
+  description: "Tile server"
 - name: "meta"
   description: "Metadata"
 schemes:
@@ -33,7 +35,7 @@ paths:
     get:
       tags:
       - "tiles"
-      summary: "Get pfb tile of the current year"
+      summary: "Get PBF tile of the current year"
       produces:
       - "application/protobuf"
       parameters:
@@ -76,7 +78,7 @@ paths:
     get:
       tags:
       - "tiles"
-      summary: "Get pfb tile of the selected year"
+      summary: "Get PBF tile of the selected year"
       produces:
       - "application/protobuf"
       parameters:
@@ -127,7 +129,7 @@ paths:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for a country"
+      summary: "Gets OSMA stats for a country"
       produces:
       - "application/json"
       parameters:
@@ -149,7 +151,7 @@ paths:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for an arbitrary area"
+      summary: "Gets OSMA stats for an arbitrary area"
       produces:
       - "application/json"
       parameters:
@@ -171,7 +173,7 @@ paths:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for a bounding box"
+      summary: "Gets OSMA stats for a bounding box"
       produces:
       - "application/json"
       parameters:
@@ -247,10 +249,8 @@ definitions:
         type: "string"
       iso:
         type: "string"
-
   FeatureType:
     type: "string"
-
   TopUser:
     type: "object"
     description: "An OSM user"
@@ -272,7 +272,7 @@ definitions:
         type: "integer"
         format: "int32"
         description: Value between 1 - 20
-      count_experience:
+      count_users:
         type: "integer"
         format: "int32"
         description: Users with this experience
@@ -300,18 +300,13 @@ definitions:
         type: "integer"
         format: "int32"
         description: Num of users active in this day
-
   FeatureStats:
     type: "object"
     properties:
-      top_users:
-        type: "array"
-        items:
-          $ref: "#/definitions/TopUser"
-      user_experience:
-        type: "array"
-        items:
-          $ref: "#/definitions/ActivityUsers"
+      count:
+        type: "integer"
+        format: "int32"
+        description: Number of [feature type]
       user_experience_min:
         type: "integer"
         format: "int32"
@@ -320,14 +315,26 @@ definitions:
         type: "integer"
         format: "int32"
         description: Maximum experience for the feature
-      user_experience_mean:
+      user_experience:
         type: "integer"
         format: "float"
         description: Mean experience for the feature
-      count:
-        type: "integer"
-        format: "int32"
-        description: Number of [feature type]
+      top_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/TopUser"
+      activity_count:
+        type: "array"
+        items:
+          $ref: "#/definitions/ActivityCount"
+      experience:
+        type: "array"
+        items:
+          $ref: "#/definitions/Experience"
+      activity_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/ActivityUsers"
   Stats:
     type: "object"
     properties:
