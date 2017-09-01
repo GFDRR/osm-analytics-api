@@ -147,11 +147,6 @@ class StatsRouter {
     partialResults.map(result => Object.assign(finalResult, result));
     ctx.body = finalResult;
   }
-
-  static async project(ctx) {
-    ctx.throw(500, 'Not implemented');
-  }
-
 }
 
 router.use(async (ctx, next) => {
@@ -172,7 +167,6 @@ router.use(async (ctx, next) => {
 router.get('/:featureType/polygon/:polyline', StatsRouter.area);
 router.get('/:featureType/bbox/:minLng,:minLat,:maxLng,:maxLat', StatsRouter.bbox);
 router.get('/:featureType/country/:iso3', StatsRouter.country);
-router.get('/:featureType/project/:id', StatsRouter.project);
 
 
 
