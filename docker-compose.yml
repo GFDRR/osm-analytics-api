@@ -35,3 +35,5 @@ services:
       file: base.yml
       service: redis
     restart: always
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
