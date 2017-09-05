@@ -16,6 +16,8 @@ tags:
   description: "Tile server"
 - name: "meta"
   description: "Metadata"
+- name: "gazeteer"
+  description: "Gazeteer"
 schemes:
 - "http"
 - "https"
@@ -31,6 +33,41 @@ parameters:
     enum: [all, buildings, highways, waterways]
 
 paths:
+  /api/v1/gazeteer/relation/{osm_id}:
+    get:
+      tags:
+      - "gazeteer"
+      summary: "Loads polygon for a given OSM ID."
+      description: "This is a wrapper endpoint for https://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A3%5D%3Brelation({osm_id})%3Bout%20geom%3B, refer to http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide#Relations for full documentation and response spec"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "osm_id"
+        in: "path"
+        description: "OSM ID, (e.g. 346134)"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+  /api/v1/gazeteer/search:
+    get:
+      tags:
+      - "gazeteer"
+      summary: "Loads metadata for multiple locations matching a given search string."
+      description: "This is a wrapper endpoint for https://nominatim.openstreetmap.org/search?format=json&q={keyword}, refer to http://wiki.openstreetmap.org/wiki/Nominatim#Search for full documentation and response spec"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "q"
+        in: "query"
+        description: "Location name, (e.g. Madrid)"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
   /{feature_type}/{z}/{x}/{y}.pbf:
     get:
       tags:
