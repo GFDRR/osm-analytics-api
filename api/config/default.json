@@ -14,7 +14,7 @@
       "port": null,
       "timeCache": 86400
     },
-    "hotProjectsUrl": "https://s3.amazonaws.com/tm-projects-vt/hotprojects.geojson",
+    "hotProjectsUrl": "https://s3.amazonaws.com/osma/hotprojects.geojson",
     "usersAPI": "http://whosthat.osmz.ru/whosthat.php?action=last&id=",
     "tileServerUrl": "http://da-tiles.osm-analytics.org/"
 }

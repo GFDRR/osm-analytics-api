@@ -15,7 +15,7 @@ Refer to the corresponding Docker container files for a full list of the depende
 
 ## Specification
 
-[View the documentation for this API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/develop/api/doc/swagger.yml)
+[View the documentation for this API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/master/api/doc/swagger.yml)
 
 
 ## Getting started
