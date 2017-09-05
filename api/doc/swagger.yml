@@ -1,21 +1,25 @@
 swagger: "2.0"
 info:
-  description: "An API to consume OSM statistics as in the OSM Analytics client"
-  version: "0.0.1"
+  description: "An API to serve OSM analytics data and statistics"
+  version: "1.0.0"
   title: "OSM Analytics API"
   contact:
     name: "Vizzuality"
-    url: "http://vizzuality.com"
+    url: "http://osm-analytics.org"
   license:
     name: "MIT"
-basePath: "/api/v1"
+
 tags:
 - name: "stats"
   description: "Core stats"
+- name: "tiles"
+  description: "Tile server"
 - name: "meta"
   description: "Metadata"
 schemes:
 - "http"
+- "https"
+host: "osm-analytics.vizzuality.com"
 
 parameters:
   feature_type:
@@ -24,22 +28,115 @@ parameters:
     description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
     required: true
     type: "string"
-    enum: [all, buildings, highways]
+    enum: [all, buildings, highways, waterways]
 
 paths:
-
-  /stats/{feature_type}/country/{iso3}:
+  /{feature_type}/{z}/{x}/{y}.pbf:
+    get:
+      tags:
+      - "tiles"
+      summary: "Get PBF tile of the current year"
+      produces:
+      - "application/protobuf"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+        required: true
+        type: "string"
+        enum: [buildings, highways, waterways]
+      - name: "z"
+        in: "path"
+        description: "Zoom level"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+        maximum: 13
+      - name: "x"
+        in: "path"
+        description: "Position X"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      - name: "y"
+        in: "path"
+        description: "Position Y"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: file
+        404:
+          description: "Tile not found"
+  /{year}/{feature_type}/{z}/{x}/{y}.pbf:
+    get:
+      tags:
+      - "tiles"
+      summary: "Get PBF tile of the selected year"
+      produces:
+      - "application/protobuf"
+      parameters:
+      - name: "feature_type"
+        in: "path"
+        description: "A feature type (buildings, highways, etc). Use the /meta/feature-types endpoint to get a list of all available feature types. Usa 'all' to get all available features in the response."
+        required: true
+        type: "string"
+        enum: [buildings, highways, waterways]
+      - name: "year"
+        in: "path"
+        description: "Year. "
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 2007
+        maximum: 2016
+      - name: "z"
+        in: "path"
+        description: "Zoom level"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+        maximum: 13
+      - name: "x"
+        in: "path"
+        description: "X position"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      - name: "y"
+        in: "path"
+        description: "Y position"
+        required: true
+        type: "integer"
+        format: "int32"
+        minimum: 0
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: file
+        404:
+          description: "Tile not found"
+  /api/v1/stats/{feature_type}/country/{iso3}:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for a country"
+      summary: "Gets OSMA stats for a country"
       produces:
       - "application/json"
       parameters:
       - $ref: '#/parameters/feature_type'
       - name: "iso3"
         in: "path"
-        description: "iso3 code of a country"
+        description: "iso3 code of a country - see GET /meta/countries"
         required: true
         type: "string"
       - name: "period"
@@ -49,24 +146,24 @@ paths:
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/Stats"
         404:
           description: "Country not found"
 
-  /stats/{feature_type}/area/{polygon}:
+  /api/v1/stats/{feature_type}/polygon/{polygon}:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for an arbitrary area"
+      summary: "Gets OSMA stats for an arbitrary area"
       produces:
       - "application/json"
       parameters:
       - $ref: '#/parameters/feature_type'
       - name: "polygon"
         in: "path"
-        description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm)"
+        description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm). Example: n~z%257BLypvpB%257BhcF%253F%253Facy%2540fobDdvO"
         required: true
         type: "string"
       - name: "period"
@@ -76,24 +173,24 @@ paths:
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/Stats"
         413:
           description: "Encoded polyline is too big"
 
-  /stats/{feature_type}/bbox/{bounds}:
+  /api/v1/stats/{feature_type}/bbox/{bounds}:
     get:
       tags:
       - "stats"
-      summary: "Gets OSM stats for a bounding box"
+      summary: "Gets OSMA stats for a bounding box"
       produces:
       - "application/json"
       parameters:
       - $ref: '#/parameters/feature_type'
       - name: "bounds"
         in: "path"
-        description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}"
+        description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}. Example: -72.88824,18.63453,-71.71930,18.93214"
         required: true
         type: "string"
       - name: "period"
@@ -103,56 +200,28 @@ paths:
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/Stats"
         405:
           description: "Invalid bounding box"
 
-  /stats/{feature_type}/project/{project_id}:
-    get:
-      tags:
-      - "stats"
-      summary: "Gets OSM stats within the boundaries of a HOT project"
-      produces:
-      - "application/json"
-      parameters:
-      - $ref: '#/parameters/feature_type'
-      - name: "project_id"
-        in: "path"
-        description: "id of HOT project"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "period"
-        in: "query"
-        description: "Period of dates to filter data yyyy-MM-dd,yyyy-MM-dd"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Stats"
-        404:
-          description: "Project not found"
-
-  /meta/countries:
+  /api/v1/meta/countries:
     get:
       tags:
       - "meta"
-      summary: "Gets all available countries"
+      summary: "Gets all available country names and ISO codes"
       produces:
       - "application/json"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Countries"
+              $ref: "#/definitions/Country"
 
-  /meta/country_polyline/{iso3}:
+  /api/v1/meta/country_polyline/{iso3}:
     get:
       tags:
       - "meta"
@@ -162,17 +231,17 @@ paths:
       parameters:
       - name: "iso3"
         in: "path"
-        description: "iso3 code of a country"
+        description: "iso3 code of a country - see GET /meta/countries"
         required: true
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             type: "string"
 
 
-  /meta/feature-types:
+  /api/v1/meta/feature-types:
     get:
       tags:
       - "meta"
@@ -181,41 +250,23 @@ paths:
       - "application/json"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/FeatureType"
 
 definitions:
-  Countries:
-    type: "array"
-    items:
-      $ref: "#/definitions/Country"
   Country:
     type: "object"
     properties:
+      name:
+        type: "string"
       iso:
         type: "string"
-      name:
-        type: "string"
-
   FeatureType:
-    type: "object"
-    properties:
-      id:
-        type: "string"
-      name:
-        type: "string"
-      geometry:
-        type: "string"
-        enum:
-        - "LineString"
-        - "Polygon"
-      tag:
-        type: "string"
-
-  User:
+    type: "string"
+  TopUser:
     type: "object"
     description: "An OSM user"
     properties:
@@ -228,88 +279,83 @@ definitions:
         description: "Number of [feature type]/kms distance of [feature type] edited in this area"
         type: "integer"
         format: "int32"
-      is_local:
-        description: "Is the user a local or remote mapper, as a confidence value between 0 and 1 (0: very likely to be a remote mapper, 1: very likely to be a local mapper). Might not be available for all users."
-        type: "integer"
-        format: "int32"
   Experience:
     type: "object"
+    description: "An OSM experience item"
     properties:
       experience:
         type: "integer"
         format: "int32"
-        description: Value between 1 - 12
+        description: Value between 1 - 20
       count_users:
         type: "integer"
         format: "int32"
         description: Users with this experience
   ActivityCount:
     type: "object"
+    description: "Features modified per day"
     properties:
       day:
         type: "integer"
         format: "int32"
-        description: Timestamp of the day
+        description: Timestamp with the day
       count_features:
         type: "integer"
         format: "int32"
-        description: Number of items/km of lines for this day
+        description: Num items this day
   ActivityUsers:
     type: "object"
+    description: "Users active per day"
     properties:
       day:
         type: "integer"
         format: "int32"
-        description: Timestamp of the day
+        description: Timestamp with the day
       count_users:
         type: "integer"
         format: "int32"
-        description: Number of distinct users for this day
-
+        description: Num of users active in this day
   FeatureStats:
     type: "object"
     properties:
-      top_users:
-        description: "A list of the users that edited features in this area"
-        type: "array"
-        items:
-          $ref: "#/definitions/User"
-      experience:
-        type: "array"
-        description: "User experience histogram (feature count per level of experience)"
-        items:
-          $ref: "#/definitions/Experience"
-      activity_count:
-        type: "array"
-        description: "Activity histogram (feature count/length) organized by days"
-        items:
-          $ref: "#/definitions/ActivityCount"
-      activity_users:
-        type: "array"
-        description: "Activity histogram (distinct users count) organized by days"
-        items:
-          $ref: "#/definitions/ActivityUsers"
-
-      user_experience_min:
-        type: "integer"
-        format: "int32"
-        description: Minimun experience for the area
-      user_experience_max:
-        type: "integer"
-        format: "int32"
-        description: Maximum experience for the area
-      user_experience_mean:
-        type: "integer"
-        format: "float"
-        description: Mean experience for the area
       count:
         type: "integer"
         format: "int32"
         description: Number of [feature type]
+      user_experience_min:
+        type: "integer"
+        format: "int32"
+        description: Minimun experience for the feature
+      user_experience_max:
+        type: "integer"
+        format: "int32"
+        description: Maximum experience for the feature
+      user_experience:
+        type: "integer"
+        format: "float"
+        description: Mean experience for the feature
+      top_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/TopUser"
+      activity_count:
+        type: "array"
+        items:
+          $ref: "#/definitions/ActivityCount"
+      experience:
+        type: "array"
+        items:
+          $ref: "#/definitions/Experience"
+      activity_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/ActivityUsers"
   Stats:
     type: "object"
     properties:
       buildings:
         $ref: "#/definitions/FeatureStats"
       highways:
+        $ref: "#/definitions/FeatureStats"
+      waterways:
         $ref: "#/definitions/FeatureStats"
