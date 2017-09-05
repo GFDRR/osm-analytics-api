@@ -1,1 +1,4 @@
 app/src/data/mbtiles
+app/src/data/*.mbtiles*
+*.mbtiles*
+app/src/data/historic/*

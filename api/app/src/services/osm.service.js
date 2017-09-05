@@ -1,8 +1,14 @@
 const logger = require('logger');
 const request = require('request-promise');
-const tileService = require('services/tile.service');
+const tileService = require('services/mbtile.service');
 const config = require('config');
 const intersect = require('@turf/intersect');
+const inside = require('@turf/inside');
+const invariant = require('@turf/invariant');
+const helpers = require('@turf/helpers');
+const booleanContains = require('@turf/boolean-contains');
+const tilebelt = require('@mapbox/tilebelt');
+
 
 
 class OSMService {
@@ -23,15 +29,15 @@ class OSMService {
     }
 
     if (feature.properties._uid) {
-      if (!summary.users[feature.properties._uid]) {
-        summary.users[feature.properties._uid] = 0;
+      if (!summary.top_users[feature.properties._uid]) {
+        summary.top_users[feature.properties._uid] = 0;
       }
-      summary.users[feature.properties._uid]++;
+      summary.top_users[feature.properties._uid]++;
     }
 
-    //recency
-    if (!summary.recency) {
-      summary.recency = {};
+    //activity_count
+    if (!summary.activity_count) {
+      summary.activity_count = {};
     }
     let day = new Date(feature.properties._timestamp * 1000)
     day.setMilliseconds(0)
@@ -39,10 +45,10 @@ class OSMService {
     day.setMinutes(0)
     day.setHours(0)
     day = +day
-    if (!summary.recency[day]) {
-      summary.recency[day] = 0;
+    if (!summary.activity_count[day]) {
+      summary.activity_count[day] = 0;
     }
-    summary.recency[day]++;
+    summary.activity_count[day]++;
 
     //experience
     if (!summary.experience) {
@@ -55,59 +61,19 @@ class OSMService {
     }
     summary.experience[experienceBin]++;
     summary.num++;
+
+    if (!summary.activity_users) {
+      summary.activity_users = {};
+    }
+    if (!summary.activity_users[day]) {
+      summary.activity_users[day] = [];
+    }
+    if (summary.activity_users[day].indexOf(feature.properties._uid) === -1) {
+      summary.activity_users[day].push(feature.properties._uid);
+    }
+
     return summary;
 
-  }
-
-  static summaryLevel12(feature, summary) {
-    if (feature.properties._count) {
-      summary.count += feature.properties._count;
-    }
-    if (feature.properties._userExperience) {
-      summary.user_experience += feature.properties._userExperience;
-    }
-    if ((feature.properties._userExperienceMin && feature.properties._userExperienceMin < summary.user_experience_min) || !summary.user_experience_min) {
-      summary.user_experience_min = feature.properties._userExperienceMin;
-    }
-    if ((feature.properties._userExperienceMax && feature.properties._userExperienceMax > summary.user_experience_max) || summary.user_experienc_max) {
-      summary.user_experience_max = feature.properties._userExperienceMax;
-    }
-
-    //recency
-    let samples = feature.properties._timestamps.split(';').map(Number);
-    let countPerSample = feature.properties._count / samples.length;
-    if (!summary.recency) {
-      summary.recency = {};
-    }
-    samples.forEach(function (sample) {
-      let day = new Date(sample * 1000)
-      day.setMilliseconds(0)
-      day.setSeconds(0)
-      day.setMinutes(0)
-      day.setHours(0)
-      day = +day
-      if (!summary.recency[day]) {
-        summary.recency[day] = 0;
-      }
-      summary.recency[day] += countPerSample;
-    });
-
-    //experience
-    samples = feature.properties._userExperiences.split(';').map(Number);
-
-    countPerSample = feature.properties._count / samples.length;
-    if (!summary.experience) {
-      summary.experience = {};
-    }
-    samples.forEach(function (sample) {
-      let experienceBin = Math.min(100, Math.floor(Math.log2(sample)));
-      if (!summary.experience[experienceBin]) {
-        summary.experience[experienceBin] = 0;
-      }
-      summary.experience[experienceBin] += countPerSample;
-    });
-
-    return summary;
   }
 
   static async manageUsers(users) {
@@ -132,33 +98,62 @@ class OSMService {
         let osm_name = await OSMService.getUser(arrayUsers[i].osm_id);
         arrayUsers[i].osm_name = osm_name;
       }
+
     }
-    return arrayUsers;
+    return arrayUsers.slice(0, 100);
   }
 
-  static async summary(geometry, layer, tiles, level, nocache)  {
-    logger.debug('Obtaining summary of ', tiles);
+  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate)  {
+    logger.info('Obtaining summary of ', tiles.length, minDate, maxDate);
     let summary = {
       count: 0,
       user_experience_min: null,
       user_experience_max: null,
       user_experience: 0,
       num: 0,
-      users: {}
+      top_users: {}
     };
 
     for (let tile of tiles) {
       try {
-        //logger.debug('Obtaining tile ', tile);
-        const features = await tileService.getTileServer(tile[2], tile[0], tile[1], layer, nocache);
+        logger.debug('Obtaining tile ', tile);
+        // z x y
+        const features = await tileService.getTile(tile[2], tile[0], tile[1], layer, nocache);
+        // check if tile is entirely inside queried geometry
+        const tileGeoJSON = tilebelt.tileToGeoJSON(tile);
+        let isTileEntirelyInQueriedGeometry = false;
+        if (geometry.type === 'MultiPolygon'){
+          for (let coordinates of geometry.coordinates){
+            isTileEntirelyInQueriedGeometry = booleanContains({type: 'Polygon', coordinates}, tileGeoJSON);
+            if (isTileEntirelyInQueriedGeometry){
+              break;
+            }
+          }
+        } else {
+          isTileEntirelyInQueriedGeometry = booleanContains(geometry, tileGeoJSON);
+        }
         if (features) {
+
+          let i = 0;
           for (let feature of features) {
-            summary.num++;
-            if (intersect(feature,{type: 'Feature', geometry })) {
-              if (tile[2] > 12) {
-                summary = OSMService.summaryLevel13(feature, summary);
-              } else {
-                summary = OSMService.summaryLevel12(feature, summary);
+            if (!minDate || !maxDate || (feature.properties._timestamp >= minDate && feature.properties._timestamp <= maxDate)) {
+              try {
+                let point = null;
+                if (feature.geometry.type.toLowerCase() === 'polygon'){
+                  point = feature.geometry.coordinates[0][0];
+                } else if (feature.geometry.type.toLowerCase() === 'linestring') {
+                  point = feature.geometry.coordinates[0];
+                } else {
+                  point = feature.geometry.coordinates;
+                }
+                const featureFirstPoint = helpers.point(point);
+                const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
+                if (isFeatureInQueriedGeometry) {
+                  summary.num++;
+                  summary = OSMService.summaryLevel13(feature, summary);
+                }
+              } catch (err) {
+                //logger.error(err);
               }
             }
           }
@@ -168,21 +163,29 @@ class OSMService {
       }
     }
     // logger.debug('summary', summary);
-    if (summary.recency) {
-      summary.recency = Object.keys(summary.recency).map(day => ({
+    if (summary.activity_count) {
+      summary.activity_count = Object.keys(summary.activity_count).map(day => ({
         day: +day,
-        count_day: summary.recency[day]
+        count_features: summary.activity_count[day]
       }));
     }
     if (summary.experience) {
       summary.experience = Object.keys(summary.experience).map(experience => ({
         experience: +experience,
-        count_experience: summary.experience[experience]
+        count_users: summary.experience[experience]
       }));
     }
     summary.user_experience = summary.user_experience / summary.num;
 
-    summary.users = await OSMService.manageUsers(summary.users);
+    summary.top_users = await OSMService.manageUsers(summary.top_users);
+
+    if (summary.activity_users) {
+      summary.activity_users = Object.keys(summary.activity_users).map(day => ({
+        day: +day,
+        count_users: summary.activity_users[day].length
+      }));
+    }
+
     delete summary.num;
     return summary;
   }

@@ -24,11 +24,10 @@ app.use(async(ctx, next) => {
   try {
     await next();
   } catch (err) {
+
     logger.error(err);
     let error = err;
-
     ctx.status = error.status || 500;
-    logger.error(error);
     ctx.body = ErrorSerializer.serializeError(ctx.status, error.message);
     if (process.env.NODE_ENV === 'prod' && this.status === 500) {
       ctx.body = 'Unexpected error';

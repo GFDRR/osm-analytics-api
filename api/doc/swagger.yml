@@ -139,6 +139,11 @@ paths:
         description: "iso3 code of a country - see GET /meta/countries"
         required: true
         type: "string"
+      - name: "period"
+        in: "query"
+        description: "Period of dates to filter data yyyy-MM-dd,yyyy-MM-dd"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Successful operation"
@@ -161,6 +166,11 @@ paths:
         description: "an area defined by a polygon encoded as a polyline (https://developers.google.com/maps/documentation/utilities/polylinealgorithm). Example: n~z%257BLypvpB%257BhcF%253F%253Facy%2540fobDdvO"
         required: true
         type: "string"
+      - name: "period"
+        in: "query"
+        description: "Period of dates to filter data yyyy-MM-dd,yyyy-MM-dd"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Successful operation"
@@ -182,6 +192,11 @@ paths:
         in: "path"
         description: "Bounds expressed as {min_lng},{min_lat},{max_lng},{max_lat}. Example: -72.88824,18.63453,-71.71930,18.93214"
         required: true
+        type: "string"
+      - name: "period"
+        in: "query"
+        description: "Period of dates to filter data yyyy-MM-dd,yyyy-MM-dd"
+        required: false
         type: "string"
       responses:
         200:
