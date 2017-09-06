@@ -355,6 +355,18 @@ definitions:
   FeatureStats:
     type: "object"
     properties:
+      min_date:
+        type: "string"
+        description: "minimum date queried"
+      max_date:
+        type: "string"
+        description: "maximum date queried"
+      country_iso:
+        type: "string"
+        description: "ISO3 code of the country queried, if applicable"
+      country_name:
+        type: "string"
+        description: "full name of the country queried, if applicable"
       count:
         type: "integer"
         format: "int32"
