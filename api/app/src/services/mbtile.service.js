@@ -122,6 +122,7 @@ class TileService {
   }
 
   async getTile(z, x, y, layer = 'buildings', nocache = false) {
+    let data = null;
     // let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
     // if (data && !nocache) {
     //   if (data === 'empty') {
