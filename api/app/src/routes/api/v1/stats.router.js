@@ -65,6 +65,8 @@ class StatsRouter {
     const partialResults = await Promise.all(promises);
     let finalResult = {};
     partialResults.map(result => Object.assign(finalResult, result));
+    finalResult.min_date = minDate;
+    finalResult.max_date = maxDate;
     ctx.body = finalResult;
 
   }
@@ -116,19 +118,21 @@ class StatsRouter {
     const partialResults = await Promise.all(promises);
     let finalResult = {};
     partialResults.map(result => Object.assign(finalResult, result));
+    finalResult.min_date = minDate;
+    finalResult.max_date = maxDate;
     ctx.body = finalResult;
   }
 
   static async country(ctx) {
     logger.info('Obtaining data by iso3 ', ctx.params.iso3);
-    let geometry = null;
+    let feature = null;
     for(let i = 0, length = countries.features.length; i < length; i++) {
       if(countries.features[i].properties.iso === ctx.params.iso3) {
-        geometry = countries.features[i].geometry;
+        feature = countries.features[i];
         break;
       }
     }
-    if (!geometry) {
+    if (!feature) {
       ctx.throw(404, 'Iso not found');
       return;
     }
@@ -149,16 +153,20 @@ class StatsRouter {
 
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, 13, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('highways', geometry, 13, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('waterways', geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('buildings', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('highways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('waterways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, feature.geometry, 13,  ctx.query.nocache, minDate, maxDate));
     }
 
     const partialResults = await Promise.all(promises);
     let finalResult = {};
     partialResults.map(result => Object.assign(finalResult, result));
+    finalResult.country_iso = feature.properties.iso;
+    finalResult.country_name = feature.properties.name_iso;
+    finalResult.min_date = minDate;
+    finalResult.max_date = maxDate;
     ctx.body = finalResult;
   }
 }
