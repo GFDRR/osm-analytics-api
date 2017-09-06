@@ -118,7 +118,7 @@ class OSMService {
       try {
         logger.debug('Obtaining tile ', tile);
         // z x y
-        const features = await tileService.getTile(tile[2], tile[0], tile[1], layer, true);
+        const features = await tileService.getTile(tile[2], tile[0], tile[1], layer, nocache);
         // check if tile is entirely inside queried geometry
         const tileGeoJSON = tilebelt.tileToGeoJSON(tile);
         let isTileEntirelyInQueriedGeometry = false;
