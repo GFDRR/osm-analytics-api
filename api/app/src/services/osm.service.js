@@ -78,8 +78,12 @@ class OSMService {
 
   static async manageUsers(users) {
     let arrayUsers = [];
+    let percentage = null;
+    let partialList = null;
     if (users) {
+      let total = 0;
       arrayUsers = Object.keys(users).map(key => {
+        total += users[key];
         return {
           osm_id: key,
           feature_value: users[key]
@@ -98,9 +102,17 @@ class OSMService {
         let osm_name = await OSMService.getUser(arrayUsers[i].osm_id);
         arrayUsers[i].osm_name = osm_name;
       }
-
+      let partial = 0;
+      partialList= arrayUsers.slice(0, 100);
+      partialList.map(el => partial += el.feature_value);
+      const percentage = (partial / total) * 100;
     }
-    return arrayUsers.slice(0, 100);
+
+    return {
+      top100Percentage: percentage,
+      length: arrayUsers.length,
+      list: partialList
+    };
   }
 
   static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate)  {
@@ -177,7 +189,11 @@ class OSMService {
     }
     summary.user_experience = summary.user_experience / summary.num;
 
-    summary.top_users = await OSMService.manageUsers(summary.top_users);
+    const manageUsersResult = await OSMService.manageUsers(summary.top_users);
+
+    summary.top_users = manageUsersResult.top_users;
+    summary.users_length = manageUsersResult.length;
+    summary.top_percentage = manageUsersResult.top100Percentage;
 
     if (summary.activity_users) {
       summary.activity_users = Object.keys(summary.activity_users).map(day => ({
