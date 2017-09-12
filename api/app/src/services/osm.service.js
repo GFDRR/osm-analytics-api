@@ -80,6 +80,7 @@ class OSMService {
     let arrayUsers = [];
     let percentage = null;
     let partialList = null;
+    let total = 0;
     if (users) {
       let total = 0;
       arrayUsers = Object.keys(users).map(key => {
@@ -111,7 +112,8 @@ class OSMService {
     return {
       top100Percentage: percentage,
       length: arrayUsers.length,
-      top_users: partialList
+      top_users: partialList,
+      total_feature_value: total
     };
   }
 

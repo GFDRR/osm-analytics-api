@@ -391,6 +391,10 @@ definitions:
         type: "integer"
         format: "float"
         description: Percentage of the total represented by the first 100 users
+      total_feature_value:
+        type: "integer"
+        format: "float"
+        description: Total sum of all feature_value of all users
       top_users:
         type: "array"
         items:
