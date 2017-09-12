@@ -105,7 +105,7 @@ class OSMService {
       let partial = 0;
       partialList= arrayUsers.slice(0, 100);
       partialList.map(el => partial += el.feature_value);
-      const percentage = (partial / total) * 100;
+      percentage = (partial / total) * 100;
     }
 
     return {
