@@ -196,6 +196,7 @@ class OSMService {
     summary.top_users = manageUsersResult.top_users;
     summary.users_length = manageUsersResult.length;
     summary.top_percentage = manageUsersResult.top100Percentage;
+    summary.total_feature_value = manageUsersResult.total_feature_value;
 
     if (summary.activity_users) {
       summary.activity_users = Object.keys(summary.activity_users).map(day => ({
