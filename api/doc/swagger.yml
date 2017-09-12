@@ -383,6 +383,14 @@ definitions:
         type: "integer"
         format: "float"
         description: Mean experience for the feature
+      users_length:
+        type: "integer"
+        format: "int32"
+        description: Total number of users
+      top_percentage:
+        type: "integer"
+        format: "float"
+        description: Percentage of the total represented by the first 100 users
       top_users:
         type: "array"
         items:
