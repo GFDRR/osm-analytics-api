@@ -82,7 +82,7 @@ class OSMService {
     let partialList = null;
     let total = 0;
     if (users) {
-      let total = 0;
+
       arrayUsers = Object.keys(users).map(key => {
         total += users[key];
         return {
