@@ -111,7 +111,7 @@ class OSMService {
     return {
       top100Percentage: percentage,
       length: arrayUsers.length,
-      list: partialList
+      top_users: partialList
     };
   }
 
