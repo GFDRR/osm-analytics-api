@@ -13,7 +13,11 @@ class GazeteerRouter {
   static async search(ctx) {
     ctx.assert(ctx.query.q, 'q query param is required');
     logger.info('Obtaining gazeteer');
-    const response = await request(`https://nominatim.openstreetmap.org/search?format=json&q=${ctx.query.q}`, {json: true});
+    const response = await request(`https://nominatim.openstreetmap.org/search?format=json&q=${ctx.query.q}`, {
+      headers: {
+        'User-Agent': 'OSM Analytics API'
+      }, json: true
+    });
     ctx.body = response;
   }
 
