@@ -17,6 +17,10 @@ Refer to the corresponding Docker container files for a full list of the depende
 
 [View the full documentation for this API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/GFDRR/osm-analytics-api/master/api/doc/swagger.yml)
 
+### Metadata
+
+The __metadata__ set of endpoints provide data on available countries, their polylines and available features
+
 #### See a list of available country codes
 
 [http://osm-analytics.vizzuality.com/api/v1/meta/countries](http://osm-analytics.vizzuality.com/api/v1/meta/countries)
@@ -25,9 +29,32 @@ Refer to the corresponding Docker container files for a full list of the depende
 
 [http://osm-analytics.vizzuality.com/api/v1/meta/country_polyline/CHE](http://osm-analytics.vizzuality.com/api/v1/meta/country_polyline/CHE)
 
+### Statistics
+
+The __statistics__ set of endpoints expect data from the __metadata__ endpoints, together with optional temporal bounds, and delivers
+computed data products based on OSM data
+
 #### Statistics for Switzerland for January 2017
 
 [http://osm-analytics.vizzuality.com/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-3](http://osm-analytics.vizzuality.com/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-31)
+
+#### Statistics a custom polygon, for `buildings` only
+
+[http://osm-analytics.vizzuality.com/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO](http://osm-analytics.vizzuality.com/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO)
+
+### Gazeteer
+
+The __Gazeteer__ endpoints make it possible to obtain the OSM IDs matching a given search term, and the associated data (including polygon)
+for each of those results.
+
+#### Search for places and OSM IDs matching the string "Madrid"
+
+[http://osm-analytics.vizzuality.com/api/v1/gazeteer/search?q=Madrid](http://osm-analytics.vizzuality.com/api/v1/gazeteer/search?q=Madrid)
+
+
+#### Get data (inc geometry) for OSM ID 5326784 (from the "Madrid" search)
+
+[http://osm-analytics.vizzuality.com/api/v1/gazeteer/relation/5326784](http://osm-analytics.vizzuality.com/api/v1/gazeteer/relation/5326784)
 
 
 ## Getting started
