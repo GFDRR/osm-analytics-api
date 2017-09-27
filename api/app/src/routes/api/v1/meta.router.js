@@ -70,7 +70,7 @@ class MetaRouter {
     const finalGeoJSON = turf_buffer(turf_simplify(largestPolyGeoJSON, tolerance), bufferKm, 'kilometers');
     const finalGeometry = finalGeoJSON.geometry.coordinates[0];
 
-    ctx.body = polyline.encode(finalGeometry);
+    ctx.body = encodeURIComponent(polyline.encode(finalGeometry));
     // var decoded = polyline.decode(polyline.encode(finalGeometry));
     // ctx.body = JSON.stringify({
     //   "type": "Feature",
