@@ -76,4 +76,6 @@ The root folders contain several files and folders necessary to boot up the `doc
 The main component is the API, which is built Nodejs + NPM, and can be found in the `api/` folder. 
 Refer to the `api/package.json` for a full list of dependencies of the API, and `api/doc` for documentation on the endpoints available on the API.
 
-Besides the API endpoints, the codebase includes scripts to warm up the cache `api/app/src/cron-app.js` 
+Besides the API endpoints, the codebase includes a script to warm up the cache for certain country-level request, which can be found in `api/app/src/cron-app.js`. 
+This script is executed after the new tiles have been loaded, and simulates a request for all features of each specific country.
+The responses to these requests are generated and cached, and will readily available for upcoming, "real" requests, speeding up the application.
