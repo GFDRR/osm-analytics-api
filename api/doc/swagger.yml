@@ -262,7 +262,7 @@ paths:
     get:
       tags:
       - "meta"
-      summary: "Gets an encoded polyline for a given country ISO3 code"
+      summary: "Gets an URL-encoded polyline for a given country ISO3 code"
       produces:
       - "application/text"
       parameters:
