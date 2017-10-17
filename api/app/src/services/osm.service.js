@@ -7,6 +7,7 @@ const inside = require('@turf/inside');
 const invariant = require('@turf/invariant');
 const helpers = require('@turf/helpers');
 const booleanContains = require('@turf/boolean-contains');
+const lineDistance = require('@turf/line-distance');
 const tilebelt = require('@mapbox/tilebelt');
 
 
@@ -17,6 +18,8 @@ class OSMService {
 
     if (feature.properties.building && feature.properties.building === 'yes') {
       summary.count++;
+    } else if (feature.properties.highway){
+      summary.count += lineDistance(feature);
     }
     if (feature.properties._userExperience) {
       summary.user_experience += feature.properties._userExperience;
