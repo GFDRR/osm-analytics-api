@@ -10,7 +10,7 @@ async function tick() {
     let time = Date.now();
     running= true;
     logger.info('Populating cache');
-    await redisService.clearCache();
+
     for(let i = 0, length = countries.features.length; i < length; i++) {
       try {
         logger.info(`Calculating country ${countries.features[i].properties.iso}`);

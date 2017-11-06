@@ -182,7 +182,7 @@ router.use(async (ctx, next) => {
   await next();
   if (ctx.body && !ctx.query.nocache) {
     logger.info(`Caching ${ctx.url}`);
-    redisService.setex(ctx.url, JSON.stringify(ctx.body));
+    redisService.setex(ctx.url, JSON.stringify(ctx.body), 'EX', 24 * 60 * 60);
   }
 });
 
