@@ -32,8 +32,8 @@ async function tick() {
         };
         await StatsRouter.country(ctx);
         logger.info(`Saving in cache /stats/all/country/${ctx.params.iso3}`);
-        redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body));
-        redisService.setex('CACHE_COUNTRY', ctx.params.iso3);
+        redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body), false);
+        redisService.setex('CACHE_COUNTRY', ctx.params.iso3, false);
       } catch(err) {
         logger.error(err);
       }
