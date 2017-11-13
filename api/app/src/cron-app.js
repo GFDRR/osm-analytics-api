@@ -13,12 +13,13 @@ async function tick() {
     let country = await redisService.getAsync('CACHE_COUNTRY');
     for(let i = 0, length = countries.features.length; i < length; i++) {
       if (country) {
-        if (country !== countries.features[i].properties.iso){
+        if (country !== countries.features[i].properties.iso || countries.features[i].properties.iso === 'ATA'){
           continue;
         } else {
           country = null;
         }
       }
+
       try {
         logger.info(`Calculating country ${countries.features[i].properties.iso}`);
         const ctx = {
