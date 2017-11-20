@@ -106,7 +106,3 @@ Refer to the `api/package.json` for a full list of dependencies of the API, and 
 Besides the API endpoints, the codebase includes a script to warm up the cache for certain country-level request, which can be found in `api/app/src/cron-app.js`. 
 This script is executed after the new tiles have been loaded, and simulates a request for all features of each specific country.
 The responses to these requests are generated and cached, and will readily available for upcoming, "real" requests, speeding up the application.
-
-## Aggregation method for contributions on different features
-
-As information regarding activity in the OSM database is expressed in different units (i.e. number of km for roads or number of individual entries in the case of buildings) we had to normalize the values in order to aggregate them in a meaningful way. The approach we chose is a simplified <a href="https://en.wikipedia.org/wiki/Mahalanobis_distance">Mahalanobis distance</a> (multi-dimensional generalization of the idea of measuring how many standard deviations away a point is from the mean of a distribution) in which, by removing the original dimension from the original data, we are able to describe the features in regards to the whole set of points, allowing us to finally aggregate features of different units in the same histogram. 
