@@ -77,6 +77,9 @@ const loadTiles = [{
   }, {
     path: `${__dirname}/../data/historic/highways.planet-2015.lowres.mbtiles`,
     name: 'highways-2015'
+  }, {
+    path: `${__dirname}/../data/historic/highways.planet-2016.lowres.mbtiles`,
+    name: 'highways-2016'
   }
 ];
 
