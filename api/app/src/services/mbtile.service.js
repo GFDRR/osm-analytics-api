@@ -82,10 +82,10 @@ const loadTiles = [{
     name: 'highways-2016'
   }, {
     path: `${__dirname}/../data/historic/waterways.planet-2015.lowres.mbtiles`,
-    name: 'highways-2015'
+    name: 'waterways-2015'
   }, {
     path: `${__dirname}/../data/historic/waterways.planet-2016.lowres.mbtiles`,
-    name: 'highways-2016'
+    name: 'waterways-2016'
   }
 
 ];
