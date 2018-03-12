@@ -13,7 +13,8 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 const loadTiles = [{
     path: `${__dirname}/../data/buildings.mbtiles`,
     name: 'buildings'
-  }, {
+  }
+  , {
     path: `${__dirname}/../data/highways.mbtiles`,
     name: 'highways'
   }, {
