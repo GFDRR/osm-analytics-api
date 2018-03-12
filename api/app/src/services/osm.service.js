@@ -263,9 +263,11 @@ class OSMService {
           count_users: summary.activity_users[day].length
         }));
       }
-
-      delete summary.num;
+    } else {
+      delete summary.top_users;
+      delete summary.activity_users;
     }
+    delete summary.num;
     return summary;
   }
 
