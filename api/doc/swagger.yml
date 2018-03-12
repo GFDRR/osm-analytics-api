@@ -183,7 +183,7 @@ paths:
         type: "string"
       - name: "precision"
         in: "query"
-        description: "Maximum zoom value for calculate the needed tiles to obtain the data. Default: 13"
+        description: "Minimum zoom value for calculate the needed tiles to obtain the data. Default: 13"
         required: false
         type: "integer"
       responses:
@@ -215,7 +215,7 @@ paths:
         type: "string"
       - name: "precision"
         in: "query"
-        description: "Maximum zoom value for calculate the needed tiles to obtain the data. Default: 13"
+        description: "Minimum zoom value for calculate the needed tiles to obtain the data. Default: 13"
         required: false
         type: "integer"
       responses:
@@ -247,7 +247,7 @@ paths:
         type: "string"
       - name: "precision"
         in: "query"
-        description: "Maximum zoom value for calculate the needed tiles to obtain the data. Default: 13"
+        description: "Minimum zoom value for calculate the needed tiles to obtain the data. Default: 13"
         required: false
         type: "integer"
       responses:
@@ -375,7 +375,7 @@ definitions:
         description: "minimum date queried"
       max_date:
         type: "string"
-        description: "maximum date queried"
+        description: "Minimum date queried"
       country_iso:
         type: "string"
         description: "ISO3 code of the country queried, if applicable"
