@@ -15,6 +15,7 @@ const tilebelt = require('@mapbox/tilebelt');
 class OSMService {
 
   static summaryLevel12(feature, summary) {
+    // logger.debug(feature);
     if (feature.properties._count) {
       summary.count += feature.properties._count;
     }
@@ -66,7 +67,7 @@ class OSMService {
   }
 
   static summaryLevel13(feature, summary) {
-    logger.debug(feature);
+
     if (feature.properties.building && feature.properties.building === 'yes') {
       summary.count++;
     } else if (feature.properties.highway){
@@ -80,6 +81,13 @@ class OSMService {
     }
     if ((feature.properties._userExperience && feature.properties._userExperience > summary.user_experience_max) || summary.user_experience_max) {
       summary.user_experience_max = feature.properties._userExperience;
+    }
+
+    if (feature.properties._uid) {
+      if (!summary.top_users[feature.properties._uid]) {
+        summary.top_users[feature.properties._uid] = 0;
+      }
+      summary.top_users[feature.properties._uid]++;
     }
 
     //activity_count
@@ -109,18 +117,70 @@ class OSMService {
     summary.experience[experienceBin]++;
     summary.num++;
 
+    if (!summary.activity_users) {
+      summary.activity_users = {};
+    }
+    if (!summary.activity_users[day]) {
+      summary.activity_users[day] = [];
+    }
+    if (summary.activity_users[day].indexOf(feature.properties._uid) === -1) {
+      summary.activity_users[day].push(feature.properties._uid);
+    }
+
     return summary;
 
   }
 
-  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate)  {
+  static async manageUsers(users) {
+    let arrayUsers = [];
+    let percentage = null;
+    let partialList = null;
+    let total = 0;
+    if (users) {
+
+      arrayUsers = Object.keys(users).map(key => {
+        total += users[key];
+        return {
+          osm_id: key,
+          feature_value: users[key]
+        }
+      }).sort((a, b) => {
+        if (a.feature_value < b.feature_value) {
+          return 1;
+        } else if (a.feature_value === b.feature_value) {
+          return 0;
+        }
+        return -1;
+      });
+
+      let usersIds = Object.keys(users);
+      for (let i = 0, length = arrayUsers.length; i < length && i < 20; i++) {
+        let osm_name = await OSMService.getUser(arrayUsers[i].osm_id);
+        arrayUsers[i].osm_name = osm_name;
+      }
+      let partial = 0;
+      partialList= arrayUsers.slice(0, 100);
+      partialList.map(el => partial += el.feature_value);
+      percentage = (partial / total) * 100;
+    }
+
+    return {
+      top100Percentage: percentage,
+      length: arrayUsers.length,
+      top_users: partialList,
+      total_feature_value: total
+    };
+  }
+
+  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate, complete = true)  {
     logger.info('Obtaining summary of ', tiles.length, minDate, maxDate);
     let summary = {
       count: 0,
       user_experience_min: null,
       user_experience_max: null,
       user_experience: 0,
-      num: 0
+      num: 0,
+      top_users: {}
     };
 
     for (let tile of tiles) {
@@ -175,6 +235,7 @@ class OSMService {
         logger.error(err);
       }
     }
+    // logger.debug('summary', summary);
     if (summary.activity_count) {
       summary.activity_count = Object.keys(summary.activity_count).map(day => ({
         day: +day,
@@ -188,8 +249,23 @@ class OSMService {
       }));
     }
     summary.user_experience = summary.user_experience / summary.num;
+    if (complete) {
+      const manageUsersResult = await OSMService.manageUsers(summary.top_users);
 
-    delete summary.num;
+      summary.top_users = manageUsersResult.top_users;
+      summary.users_length = manageUsersResult.length;
+      summary.top_percentage = manageUsersResult.top100Percentage;
+      summary.total_feature_value = manageUsersResult.total_feature_value;
+
+      if (summary.activity_users) {
+        summary.activity_users = Object.keys(summary.activity_users).map(day => ({
+          day: +day,
+          count_users: summary.activity_users[day].length
+        }));
+      }
+
+      delete summary.num;
+    }
     return summary;
   }
 

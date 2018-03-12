@@ -22,7 +22,7 @@ class StatsRouter {
       max_zoom: 13
     };
     const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate);
+    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate, precision === 13);
     return {
       [featureType]: response
     };

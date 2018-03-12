@@ -398,6 +398,22 @@ definitions:
         type: "integer"
         format: "float"
         description: Mean experience for the feature
+      users_length:
+        type: "integer"
+        format: "int32"
+        description: Total number of users
+      top_percentage:
+        type: "integer"
+        format: "float"
+        description: Percentage of the total represented by the first 100 users
+      total_feature_value:
+        type: "integer"
+        format: "float"
+        description: Total sum of all feature_value of all users
+      top_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/TopUser"
       activity_count:
         type: "array"
         items:
@@ -406,6 +422,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Experience"
+      activity_users:
+        type: "array"
+        items:
+          $ref: "#/definitions/ActivityUsers"
   Stats:
     type: "object"
     properties:
