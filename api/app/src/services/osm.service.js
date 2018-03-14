@@ -243,10 +243,14 @@ class OSMService {
       }));
     }
     if (summary.experience) {
-      summary.experience = Object.keys(summary.experience).map(experience => ({
-        experience: +experience,
-        count_users: summary.experience[experience]
-      }));
+      summary.total_feature_value = 0;
+      summary.experience = Object.keys(summary.experience).map(experience => {
+        summary.total_feature_value += summary.experience[experience];
+        return {
+          experience: +experience,
+          count_users: summary.experience[experience]
+        };
+      });
     }
     summary.user_experience = summary.user_experience / summary.num;
     if (complete) {
