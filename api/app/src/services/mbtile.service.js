@@ -13,7 +13,8 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 const loadTiles = [{
     path: `${__dirname}/../data/buildings.mbtiles`,
     name: 'buildings'
-  }, {
+  }
+  , {
     path: `${__dirname}/../data/highways.mbtiles`,
     name: 'highways'
   }, {
@@ -77,7 +78,17 @@ const loadTiles = [{
   }, {
     path: `${__dirname}/../data/historic/highways.planet-2015.lowres.mbtiles`,
     name: 'highways-2015'
+  }, {
+    path: `${__dirname}/../data/historic/highways.planet-2016.lowres.mbtiles`,
+    name: 'highways-2016'
+  }, {
+    path: `${__dirname}/../data/historic/waterways.planet-2015.lowres.mbtiles`,
+    name: 'waterways-2015'
+  }, {
+    path: `${__dirname}/../data/historic/waterways.planet-2016.lowres.mbtiles`,
+    name: 'waterways-2016'
   }
+
 ];
 
 class TileService {

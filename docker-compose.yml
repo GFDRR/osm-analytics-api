@@ -37,3 +37,4 @@ services:
     restart: always
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data:/data

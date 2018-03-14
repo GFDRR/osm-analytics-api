@@ -16,8 +16,12 @@ class RedisService {
     return this.redisClient.getAsync(key);
   }
 
-  setex(key, value){
-    return this.redisClient.setex(key, this.timeCache, value);
+  setex(key, value, expireCache = true){
+    if (expireCache){
+      return this.redisClient.setex(key, this.timeCache, value);
+    } else {
+      return this.redisClient.set(key, value);
+    }
   }
 
   async clearCache(){

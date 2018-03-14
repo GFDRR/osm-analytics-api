@@ -10,8 +10,16 @@ async function tick() {
     let time = Date.now();
     running= true;
     logger.info('Populating cache');
-    await redisService.clearCache();
+    let country = await redisService.getAsync('CACHE_COUNTRY');
     for(let i = 0, length = countries.features.length; i < length; i++) {
+      if (country) {
+        if (country !== countries.features[i].properties.iso || countries.features[i].properties.iso === 'ATA'){
+          continue;
+        } else {
+          country = null;
+        }
+      }
+
       try {
         logger.info(`Calculating country ${countries.features[i].properties.iso}`);
         const ctx = {
@@ -25,7 +33,9 @@ async function tick() {
         };
         await StatsRouter.country(ctx);
         logger.info(`Saving in cache /stats/all/country/${ctx.params.iso3}`);
-        redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body));
+        redisService.setex(`/stats/all/country/${ctx.params.iso3}`, JSON.stringify(ctx.body), false);
+        redisService.setex('CACHE_COUNTRY', ctx.params.iso3, false);
+        logger.info(`${ctx.params.iso3} calculated correctly`);
       } catch(err) {
         logger.error(err);
       }
@@ -36,4 +46,4 @@ async function tick() {
 }
 
 logger.info('Cron started');
-new CronJob('00 00 18 * * *', tick, null, true, 'Europe/Madrid');  // eslint-disable-line no-new
+new CronJob('00 45 12 * * *', tick, null, true, 'Europe/Madrid');  // eslint-disable-line no-new

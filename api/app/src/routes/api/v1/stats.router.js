@@ -14,15 +14,15 @@ const router = new Router({
 
 class StatsRouter {
 
-  static async calculate(featureType, geometry, zoom, nocache=false, minDate=null, maxDate=null) {
+  static async calculate(featureType, geometry, zoom, nocache=false, minDate=null, maxDate=null, precision=13) {
 
     logger.debug('Obtaining tiles');
     const limits = {
-      min_zoom: 13,
+      min_zoom: precision,
       max_zoom: 13
     };
     const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate);
+    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate, precision === 13);
     return {
       [featureType]: response
     };
@@ -53,13 +53,15 @@ class StatsRouter {
       return;
     }
 
+    const precision = ctx.query.precision && !isNaN(ctx.query.precision) ? parseInt(ctx.query.precision) : 13;
+
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('buildings', geometry, null, ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('highways', geometry, null, ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate, precision));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, null, ctx.query.nocache, minDate, maxDate, precision));
     }
 
     const partialResults = await Promise.all(promises);
@@ -106,13 +108,15 @@ class StatsRouter {
       return;
     }
 
+    const precision = ctx.query.precision && !isNaN(ctx.query.precision) ? parseInt(ctx.query.precision) : 13;
+
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', geometry, null,  ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('buildings', geometry, null,  ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('highways', geometry, null,  ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('waterways', geometry, null, ctx.query.nocache, minDate, maxDate, precision));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, geometry, 13,  ctx.query.nocache, minDate, maxDate, precision));
     }
 
     const partialResults = await Promise.all(promises);
@@ -151,13 +155,15 @@ class StatsRouter {
       return;
     }
 
+    const precision = ctx.query.precision && !isNaN(ctx.query.precision) ? parseInt(ctx.query.precision) : 13;
+
     const promises = [];
     if (ctx.params.featureType === 'all') {
-      promises.push(StatsRouter.calculate('buildings', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('highways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
-      promises.push(StatsRouter.calculate('waterways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate('buildings', feature.geometry, 13, ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('highways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate, precision));
+      promises.push(StatsRouter.calculate('waterways', feature.geometry, 13, ctx.query.nocache, minDate, maxDate, precision));
     } else {
-      promises.push(StatsRouter.calculate(ctx.params.featureType, feature.geometry, 13,  ctx.query.nocache, minDate, maxDate));
+      promises.push(StatsRouter.calculate(ctx.params.featureType, feature.geometry, 13,  ctx.query.nocache, minDate, maxDate, precision));
     }
 
     const partialResults = await Promise.all(promises);
@@ -182,7 +188,7 @@ router.use(async (ctx, next) => {
   await next();
   if (ctx.body && !ctx.query.nocache) {
     logger.info(`Caching ${ctx.url}`);
-    redisService.setex(ctx.url, JSON.stringify(ctx.body));
+    redisService.setex(ctx.url, JSON.stringify(ctx.body), 'EX', 24 * 60 * 60);
   }
 });
 
