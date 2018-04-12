@@ -18,8 +18,8 @@ class StatsRouter {
 
     logger.debug('Obtaining tiles');
     const limits = {
-      min_zoom: precision,
-      max_zoom: 13
+      min_zoom: 1,
+      max_zoom: precision
     };
     const tiles = cover.tiles(geometry, limits);
     const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate, precision === 13);
