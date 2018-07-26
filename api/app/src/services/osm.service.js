@@ -2,6 +2,7 @@ const logger = require('logger');
 const request = require('request-promise');
 const tileService = require('services/tile.service');
 const config = require('config');
+const centroid = require('@turf/centroid').default;
 const intersect = require('@turf/intersect');
 const inside = require('@turf/inside');
 const invariant = require('@turf/invariant');
@@ -10,14 +11,16 @@ const booleanContains = require('@turf/boolean-contains');
 const lineDistance = require('@turf/line-distance');
 const tilebelt = require('@mapbox/tilebelt');
 
-
-
 class OSMService {
 
-  static summaryLevel12(feature, summary) {
-    // logger.debug(feature);
+  static summaryLevel12(feature, summary, minDate, maxDate) {
+    logger.debug(feature.properties._count);
+    let samples = feature.properties._timestamps.split(';').map(Number);
+    let matchingSamples = samples.filter(t => t >= minDate && t<= maxDate).length;
+    let countPerSample = feature.properties._count / samples.length;
+    
     if (feature.properties._count) {
-      summary.count += feature.properties._count;
+      summary.count += matchingSamples * countPerSample;
     }
     if (feature.properties._userExperience) {
       summary.user_experience += feature.properties._userExperience;
@@ -30,8 +33,8 @@ class OSMService {
     }
 
     //activity_count
-    let samples = feature.properties._timestamps.split(';').map(Number);
-    let countPerSample = feature.properties._count / samples.length;
+    samples = feature.properties._timestamps.split(';').map(Number);
+    countPerSample = feature.properties._count / samples.length;
     if (!summary.activity_count) {
       summary.activity_count = {};
     }
@@ -172,7 +175,7 @@ class OSMService {
     };
   }
 
-  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate, complete = true)  {
+  static async summary(geometry, layer, tiles, level, nocache, minDate, maxDate, complete = true) {
     logger.info('Obtaining summary of ', tiles.length, minDate, maxDate);
     let summary = {
       count: 0,
@@ -191,38 +194,33 @@ class OSMService {
         // check if tile is entirely inside queried geometry
         const tileGeoJSON = tilebelt.tileToGeoJSON(tile);
         let isTileEntirelyInQueriedGeometry = false;
-        if (geometry.type === 'MultiPolygon'){
-          for (let coordinates of geometry.coordinates){
-            isTileEntirelyInQueriedGeometry = booleanContains({type: 'Polygon', coordinates}, tileGeoJSON);
-            if (isTileEntirelyInQueriedGeometry){
-              break;
+        function contains(geometry, other) {
+          if (geometry.type === 'MultiPolygon') {
+            for (let coordinates of geometry.coordinates) {
+              if (booleanContains({type: 'Polygon', coordinates}, other)) {
+                return true;
+              }
             }
+            return false;
+          } else {
+            return booleanContains(geometry, other);
           }
-        } else {
-          isTileEntirelyInQueriedGeometry = booleanContains(geometry, tileGeoJSON);
         }
+        isTileEntirelyInQueriedGeometry = contains(geometry, tileGeoJSON);
         if (features) {
 
           let i = 0;
           for (let feature of features) {
-            if (!minDate || !maxDate || (feature.properties._timestamp >= minDate && feature.properties._timestamp <= maxDate)) {
+            if (!minDate || !maxDate || (tile[2] <= 12) || (feature.properties._timestamp >= minDate && feature.properties._timestamp <= maxDate)) {
               try {
-                let point = null;
-                if (feature.geometry.type.toLowerCase() === 'polygon'){
-                  point = feature.geometry.coordinates[0][0];
-                } else if (feature.geometry.type.toLowerCase() === 'linestring') {
-                  point = feature.geometry.coordinates[0];
-                } else {
-                  point = feature.geometry.coordinates;
-                }
-                const featureFirstPoint = helpers.point(point);
-                const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || inside(featureFirstPoint, geometry);
+                const point = centroid(feature);
+                const isFeatureInQueriedGeometry = isTileEntirelyInQueriedGeometry || contains(geometry, point);
                 if (isFeatureInQueriedGeometry) {
                   summary.num++;
                   if (tile[2] > 12) {
                     summary = OSMService.summaryLevel13(feature, summary);
                   } else {
-                    summary = OSMService.summaryLevel12(feature, summary);
+                    summary = OSMService.summaryLevel12(feature, summary, minDate, maxDate);
                   }
                 }
               } catch (err) {
@@ -272,7 +270,7 @@ class OSMService {
   }
 
   static async getUser(userId) {
-    try  {
+    try {
       const body = await request.get(`${config.get('usersAPI')}${userId}`);
       const name = JSON.parse(body);
       if (name && name.length === 1 && name[0]) {
