@@ -1,6 +1,6 @@
 const logger = require('logger');
 const request = require('request-promise');
-const tileService = require('services/mbtile.service');
+const tileService = require('services/tile.service');
 const config = require('config');
 const intersect = require('@turf/intersect');
 const inside = require('@turf/inside');
