@@ -23,11 +23,11 @@ The __metadata__ set of endpoints provide data on available countries, their pol
 
 #### See a list of available country codes
 
-[http://osm-analytics.vizzuality.com/api/v1/meta/countries](http://osm-analytics.vizzuality.com/api/v1/meta/countries)
+[https://api.osm-analytics.org/api/v1/meta/countries](https://api.osm-analytics.org/api/v1/meta/countries)
 
 #### Get an encoded polyline for Switzerland
 
-[http://osm-analytics.vizzuality.com/api/v1/meta/country_polyline/CHE](http://osm-analytics.vizzuality.com/api/v1/meta/country_polyline/CHE)
+[https://api.osm-analytics.org/api/v1/meta/country_polyline/CHE](https://api.osm-analytics.org/api/v1/meta/country_polyline/CHE)
 
 ### Statistics
 
@@ -36,11 +36,11 @@ computed data products based on OSM data
 
 #### Statistics for Switzerland for January 2017
 
-[http://osm-analytics.vizzuality.com/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-3](http://osm-analytics.vizzuality.com/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-31)
+[https://api.osm-analytics.org/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-3](https://api.osm-analytics.org/api/v1/stats/all/country/CHE?period=2017-01-01%2C2017-01-31)
 
 #### Statistics a custom polygon, for `buildings` only
 
-[http://osm-analytics.vizzuality.com/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO](http://osm-analytics.vizzuality.com/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO)
+[https://api.osm-analytics.org/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO](https://api.osm-analytics.org/api/v1/stats/buildings/polygon/n%7Ez%25257BLypvpB%25257BhcF%25253F%25253Facy%252540fobDdvO)
 
 ### Gazeteer
 
@@ -49,12 +49,12 @@ for each of those results.
 
 #### Search for places and OSM IDs matching the string "Madrid"
 
-[http://osm-analytics.vizzuality.com/api/v1/gazeteer/search?q=Madrid](http://osm-analytics.vizzuality.com/api/v1/gazeteer/search?q=Madrid)
+[https://api.osm-analytics.org/api/v1/gazeteer/search?q=Madrid](https://api.osm-analytics.org/api/v1/gazeteer/search?q=Madrid)
 
 
 #### Get data (inc geometry) for OSM ID 5326784 (from the "Madrid" search)
 
-[http://osm-analytics.vizzuality.com/api/v1/gazeteer/relation/5326784](http://osm-analytics.vizzuality.com/api/v1/gazeteer/relation/5326784)
+[https://api.osm-analytics.org/api/v1/gazeteer/relation/5326784](https://api.osm-analytics.org/api/v1/gazeteer/relation/5326784)
 
 
 ## Getting started
