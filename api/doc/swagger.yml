@@ -21,7 +21,7 @@ tags:
 schemes:
 - "http"
 - "https"
-host: "osm-analytics.vizzuality.com"
+host: "api.osm-analytics.org"
 
 parameters:
   feature_type:
