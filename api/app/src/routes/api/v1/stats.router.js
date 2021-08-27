@@ -12,17 +12,22 @@ const router = new Router({
 });
 
 
+const tileLimit = 240 // maximum number of tiles to load per request
+
 class StatsRouter {
 
   static async calculate(featureType, geometry, zoom, nocache=false, minDate=null, maxDate=null, precision=13) {
 
     logger.debug('Obtaining tiles');
-    const limits = {
-      min_zoom: precision,
-      max_zoom: 13
-    };
-    const tiles = cover.tiles(geometry, limits);
-    const response = await OSMService.summary(geometry, featureType, tiles, limits.max_zoom, nocache, minDate, maxDate, precision === 13);
+    var max = 13;
+    var tiles
+    do {
+      tiles = cover.tiles(geometry, {
+        min_zoom: Math.min(max, precision),
+        max_zoom: max--
+      });
+    } while (tiles.length > tileLimit);
+    const response = await OSMService.summary(geometry, featureType, tiles, max+1, nocache, minDate, maxDate, max+1 === 13);
     return {
       [featureType]: response
     };

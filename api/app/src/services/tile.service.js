@@ -16,15 +16,17 @@ class TileService {
 
 
   async getTile(z, x, y, layer = 'buildings', nocache=false) {
-    let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
+    /*let data = await redisService.getAsync(`${layer}/${z}/${x}/${y}`);
     if (data && !nocache) {
       if (data === 'empty'){
         return null;
       }
       return JSON.parse(data);
     }
-    logger.debug(`Cache fail ${layer}/${z}/${x}/${y}`);
+    logger.debug(`Cache fail ${layer}/${z}/${x}/${y}`);*/
+    let data;
     const url = `${config.get('tileServerUrl')}${layer}/${z}/${x}/${y}.pbf`;
+    logger.debug(`getting ${url}`)
     try {
       const res = await request.get({
         url,
@@ -37,17 +39,17 @@ class TileService {
         headers: res.headers
       }, z, x, y);
 
-      logger.debug(`Saving cache ${layer}/${z}/${x}/${y}`);
+      /*logger.debug(`Saving cache ${layer}/${z}/${x}/${y}`);
       if (!nocache) {
         redisService.setex(`${layer}/${z}/${x}/${y}`, JSON.stringify(data));
-      }
+      }*/
 
       return data;
     } catch(err) {
       logger.debug(err);
       if (err.statusCode === 404) {
-        logger.debug(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
-        redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');
+        /*logger.debug(`Tile (${layer}/${z}/${x}/${y}) does not exist. Saving empty in cache`);
+        redisService.setex(`${layer}/${z}/${x}/${y}`, 'empty');*/
       }
     }
   }

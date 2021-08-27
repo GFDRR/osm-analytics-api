@@ -41,6 +41,7 @@
     "@turf/area": "^4.4.0",
     "@turf/boolean-contains": "^4.5.2",
     "@turf/buffer": "^4.4.0",
+    "@turf/centroid": "^6.0.2",
     "@turf/helpers": "^4.5.2",
     "@turf/inside": "^4.5.2",
     "@turf/intersect": "^4.4.0",
