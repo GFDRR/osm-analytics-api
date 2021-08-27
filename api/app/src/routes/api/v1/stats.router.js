@@ -12,7 +12,7 @@ const router = new Router({
 });
 
 
-const tileLimit = 24 // maximum number of tiles to load per request
+const tileLimit = 240 // maximum number of tiles to load per request
 
 class StatsRouter {
 
@@ -27,7 +27,7 @@ class StatsRouter {
         max_zoom: max--
       });
     } while (tiles.length > tileLimit);
-    const response = await OSMService.summary(geometry, featureType, tiles, max+1, nocache, minDate, maxDate, precision === 13);
+    const response = await OSMService.summary(geometry, featureType, tiles, max+1, nocache, minDate, maxDate, max+1 === 13);
     return {
       [featureType]: response
     };

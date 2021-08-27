@@ -70,11 +70,10 @@ class OSMService {
   }
 
   static summaryLevel13(feature, summary) {
-
-    if (feature.properties.building && feature.properties.building === 'yes') {
-      summary.count++;
-    } else if (feature.properties.highway){
+    if (feature.geometry.type === 'LineString') {
       summary.count += lineDistance(feature);
+    } else {
+      summary.count++;
     }
     if (feature.properties._userExperience) {
       summary.user_experience += feature.properties._userExperience;
